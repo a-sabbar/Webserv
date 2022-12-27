@@ -22,10 +22,7 @@ int parsing(std::string  file)
 		std::cout << "Error : i can't found this file\n" << std::endl;
 		return (-1);
 	}
-    while (getline(myfile,value, '\0'))
-    {
-        std::cout << "*" << std::endl;
-    }
-    std::cout << value << std::endl;
-    return (0);
+	getline(myfile,value, '\0');
+	std::cout << value << std::endl;
+	return (0);
 }
