@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:30 by zait-sli          #+#    #+#             */
-/*   Updated: 2022/12/30 04:40:31 by zait-sli         ###   ########.fr       */
+/*   Updated: 2022/12/30 12:24:13 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,5 +37,6 @@ class server
 		server & operator=(const server &assign);
 		
 };
+
 
 #endif

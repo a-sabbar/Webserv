@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:26 by zait-sli          #+#    #+#             */
-/*   Updated: 2022/12/30 04:40:27 by zait-sli         ###   ########.fr       */
+/*   Updated: 2022/12/30 12:24:16 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,4 +38,3 @@ server & server::operator=(const server &assign)
 	(void) assign;
 	return *this;
 }
-
