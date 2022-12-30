@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/20 09:25:45 by asabbar           #+#    #+#             */
-/*   Updated: 2022/12/25 18:02:44 by asabbar          ###   ########.fr       */
+/*   Updated: 2022/12/26 15:13:48 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,5 @@
 
 
 int parsing(std::string file);
-char	**ft_split(char const *s, char c);
 
 #endif
