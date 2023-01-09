@@ -3,23 +3,46 @@
 /*                                                        :::      ::::::::   */
 /*   parse.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:23 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/07 11:14:58 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/09 17:36:49 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parse.hpp"
 
-// Constructors
+int check_brackets(std::string &str)
+{
+	int i = 0;
+	int j = 0;
+	while (str[i])
+	{
+		if (str[i] == '{')
+			j++;
+		if (str[i] == '}')
+			j--;
+		i++;
+	}
+	if (j == 0)
+		return (0);
+	else
+		return (-1);
+}
+
+
+
+
 parse::parse()
 {
 }
+
 parse::parse(std::string file)
 {
 	readConfig(file);
-	collectData();
+	setsers();
+	
+	// collectData();
 }
 
 parse::parse(const parse &copy)
@@ -27,6 +50,38 @@ parse::parse(const parse &copy)
 	(void) copy;
 }
 
+int getCloseBrackets(std::string &str, size_t i)
+{
+	int j = 0;
+	while (str[i])
+	{
+		if (str[i] == '{')
+			j++;
+		if (str[i] == '}')
+			j--;
+		if (j == 0)
+			return (i);
+		i++;
+	}
+	return (-1);
+}
+
+void parse::setsers()
+{
+	size_t first = rawFile.find_first_of("{",0);
+	size_t second = getCloseBrackets(rawFile, first);
+	for (;;)
+	{
+		servs.push_back(rawFile.substr(first, second - first + 1));
+		first = rawFile.find_first_of("{", second);
+		if (first == std::string::npos)
+			break;
+		second = getCloseBrackets(rawFile, first);
+	}
+	
+	
+	
+}
 
 void parse::remove_comments()
 {
@@ -48,6 +103,7 @@ void parse::remove_comments()
 	}
 }
 
+
 void parse::readConfig(std::string fileName)
 {
     std::ifstream   myfile;
@@ -58,13 +114,19 @@ void parse::readConfig(std::string fileName)
 	if(rawFile.empty())
 		throw ConfigNotValid();
 	remove_comments();
+	if(check_brackets(rawFile) == -1)
+		throw ConfigNotValid();
 }
 
+std::vector<serv_d> &parse::getServer()
+{
+	return serv;
+}
 
 void parse::collectData()
 {
 	std::string Fpart;
-	server s;
+	serv_d s;
 	size_t firstBracket = rawFile.find_first_of("{",0);
 	size_t secondBracket = rawFile.find_first_of("{",firstBracket+1);
 
@@ -75,7 +137,7 @@ void parse::collectData()
 	s.server_name =  getParam(Fpart,"server_name");
 	s.host = getParam(Fpart,"host");
 	s.listen = getParam(Fpart,"listen");
-	s.root = getParam(Fpart,"root");..............
+	s.root = getParam(Fpart,"root");
 	
 }
 

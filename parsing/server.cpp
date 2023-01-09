@@ -3,34 +3,102 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:26 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/07 10:44:27 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/09 17:36:00 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 
 // Constructors
-server::server()
+serv_d::serv_d() : backlog(10)
 {
 }
 
-server::server(const server &copy)
+
+
+
+void serv_d::set_sock(int sock)
 {
-	(void) copy;
+	this->sock = sock;
 }
 
 
-// Destructor
-server::~server()
+void serv_d::set_backlog(int backlog)
+{
+	this->backlog =backlog;
+}
+
+
+void serv_d::set_listening(int listening)
+{
+	this->listen = listening;
+}
+
+
+void serv_d::set_connection(int connection)
+{
+	this->connection = connection;
+}
+
+
+void serv_d::set_new_socket(int	new_socket)
+{
+	this->new_socket = new_socket;
+}
+
+
+void serv_d::set_root(std::string root)
+{
+	this->root = root;
+}
+
+
+void serv_d::set_host(std::string host)
+{
+	this->host =host;
+}
+
+
+void serv_d::set_listen(std::string listen)
+{
+	this->listen = listen;
+}
+
+
+
+
+void serv_d::set_max_body_size(size_t max_body_size)
+{
+	this->max_body_size = max_body_size;
+}
+
+
+void serv_d::set_server_name(std::string server_name)
+{
+	this->server_name = server_name;
+}
+
+
+void serv_d::set_address(struct sockaddr_in address)
+{
+	this->address = address;
+}
+
+
+
+
+
+// // Destructor
+serv_d::~serv_d()
 {
 }
 
 
 // Operators
-server & server::operator=(const server &assign)
+serv_d & serv_d::operator=(const serv_d &assign)
 {
 	(void) assign;
 	return *this;
