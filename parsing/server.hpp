@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:30 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/09 17:41:51 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/11 21:30:29 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,23 +35,26 @@ class serv_d
 	public:
 		int sock;
 		int backlog;
+		bool	is_accept;
+		bool	f_read;
+		std::string request;
 		int listening;
 		int connection;
-		int	new_socket;
 		std::string root;
 		std::string host;
 		std::string listen;               // momkin tkoun vector 
-		char buffer[3000000];
+		char buffer[300];
 		size_t max_body_size;             //always with B
 		std::string server_name;
 		struct sockaddr_in address;
-	
+
+
+		
 		serv_d();
 		void set_sock(int sock);
 		void set_backlog(int backlog);
 		void set_listening(int listening);
 		void set_connection(int connection);
-		void set_new_socket(int	new_socket);
 		void set_root(std::string root);
 		void set_host(std::string host);
 		void set_listen(std::string listen);

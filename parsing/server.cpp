@@ -6,14 +6,14 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:26 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/09 17:36:00 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/11 20:34:14 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 
 // Constructors
-serv_d::serv_d() : backlog(10)
+serv_d::serv_d() :  sock(-1) , backlog(32), is_accept(false), f_read(false)
 {
 }
 
@@ -43,11 +43,6 @@ void serv_d::set_connection(int connection)
 	this->connection = connection;
 }
 
-
-void serv_d::set_new_socket(int	new_socket)
-{
-	this->new_socket = new_socket;
-}
 
 
 void serv_d::set_root(std::string root)
