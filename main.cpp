@@ -6,13 +6,13 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/19 10:42:44 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/11 21:00:33 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/14 09:57:58 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Webserv.hpp"
 
-
+                    
 void    print_error(std::string  print)
 {
     std::cerr << print << std::endl;

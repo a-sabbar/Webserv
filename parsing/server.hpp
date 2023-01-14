@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:30 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/11 21:30:29 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/14 09:57:33 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,24 +30,33 @@
 #include <netinet/in.h>
 #include <string>
 
+class client_d
+{
+	public:
+		int 			acceptFd;
+		int 			socketFd;
+		bool 			endSend;
+		bool			isAccept;
+		bool			endRead;
+		std::string		request;
+		char			buffer[300];
+		unsigned long	lenRead; 
+};
+
 class serv_d
 {
 	public:
 		int sock;
 		int backlog;
 		bool	is_accept;
-		bool	f_read;
-		std::string request;
 		int listening;
 		int connection;
 		std::string root;
 		std::string host;
 		std::string listen;               // momkin tkoun vector 
-		char buffer[300];
 		size_t max_body_size;             //always with B
 		std::string server_name;
 		struct sockaddr_in address;
-
 
 		
 		serv_d();

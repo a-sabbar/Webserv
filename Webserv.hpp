@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/20 09:25:45 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/10 16:58:26 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/13 18:18:38 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include "parsing/parse.hpp"
 #include "parsing/server.hpp"
+#include "Request/HandleRequest.hpp"
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <poll.h>
@@ -28,6 +29,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string>
-
+// using namespace std;
 void    run_server(std::vector<serv_d> &servers);
+
 #endif

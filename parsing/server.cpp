@@ -6,14 +6,14 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:26 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/11 20:34:14 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/14 10:01:48 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 
 // Constructors
-serv_d::serv_d() :  sock(-1) , backlog(32), is_accept(false), f_read(false)
+serv_d::serv_d() :  sock(-1) , backlog(32)
 {
 }
 
