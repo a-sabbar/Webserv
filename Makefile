@@ -10,6 +10,7 @@ VERSION = -std=c++98  -Wall -Wextra -Werror
 SRC =	main.cpp	\
 		parsing/server.cpp	\
 		Run_serv/run_server.cpp	\
+		Request/HandleRequest.cpp	\
 
 OBJECTS = $(SRC:.cpp=.opp)
 

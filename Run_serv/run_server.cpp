@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run_server.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/09 17:39:00 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/13 18:29:47 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void testCnnection (int item)
 {
 	if(item < 0)
 	{
-		perror("KO :(\nFailed to connect    : ");
+		perror("KO :(\nFailed to connect  : ");
 		exit(1);
 	}
 	return ;
@@ -87,6 +87,8 @@ void    run_server(std::vector<serv_d> &servers)
 						it++;
 					Accept((*it));
 					std::cout << "{{{\n\n"<<it->buffer <<  " \n}\n";
+					HandleRequest h(it->buffer);
+					std::cout << h.getCode() << std::endl;
 				}
 			}
 			
