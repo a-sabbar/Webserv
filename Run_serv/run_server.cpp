@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/15 02:04:59 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/15 04:54:13 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,7 +209,7 @@ void    run_server(std::vector<serv_d> &servers)
 
 						
 
-						// std::cout << it_c->request << std::endl;
+						std::cout << it_c->request << std::endl;
 						HandleRequest h(it_c->request);								///////   HandleRequest
 						// std::cout << h.getCode() << std::endl;						///////   HandleRequest
 

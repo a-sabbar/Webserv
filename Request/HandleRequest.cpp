@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/15 02:01:43 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/15 05:02:52 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,18 @@ HandleRequest::HandleRequest(std::string buff)
 	if (!queryString.empty())
 		std::cout<< queryString << std::endl;
 	ckeckSline();
-	body = buff.substr(buff.find(Spliter));
-	ckeckHeaders();
-	splitBody();
+	if (code == 200)
+	{
+		body = buff.substr(buff.find(Spliter));
+		ckeckHeaders();
+		if (headers["Content-Type"] == "multipart/form-data")
+			splitBody();
+		else if (headers["Content-Type"] == "application/octet-stream")
+			cout << "mar7aba" << endl;
+	}
+	cout << "-----------------------------" << endl;
+	cout << message << endl;
+	cout << code << endl;
 }
 
 int HandleRequest::ckeckSline()
@@ -67,11 +76,18 @@ int HandleRequest::ckeckHeaders()
 		if (temp.find("boundary=") != string::npos)
 		{
 			Boundary = temp.substr(temp.find("boundary=") + 9);
+			cout << temp << endl;
 			temp = temp.substr(0, temp.find("boundary=") - 2);
 			headers["Content-Type"] = temp;
 		}
 	}
-	return 1;
+	if (headers["Host"].empty())
+	{
+		message = "Host prob";
+		code = 5545;
+		return 1;
+	}
+	return 0;
 }
 
 
@@ -117,9 +133,7 @@ void HandleRequest::treatSline(std::string startLine)
 	startLine = startLine.substr(target.size() + 1);
 	version = startLine.substr(0,startLine.find_first_of(" "));
 	if (target.find("?") != std::string::npos)
-	{
 		queryString = target.substr(target.find("?"));
-	}
 }
 
 void HandleRequest::treatHeaders(std::string hd)
