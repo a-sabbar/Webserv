@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/20 09:25:45 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/13 18:18:38 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/15 01:59:20 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string>
-// using namespace std;
+using namespace std;
 void    run_server(std::vector<serv_d> &servers);
 
-#endif
+#endif

@@ -2,7 +2,7 @@ NAME = webser
 
 GG = c++
 
-Header1 =  Webserv.hpp
+Header1 =  Webserv.hpp Request/HandleRequest.hpp Request/Getdata.hpp	
 
 VERSION = -std=c++98  -Wall -Wextra -Werror 
 
@@ -11,6 +11,7 @@ SRC =	main.cpp	\
 		parsing/server.cpp	\
 		Run_serv/run_server.cpp	\
 		Request/HandleRequest.cpp	\
+		Request/Getdata.cpp	\
 
 OBJECTS = $(SRC:.cpp=.opp)
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleRequest.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/14 09:59:06 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/15 01:59:50 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,33 @@
 # define HANDLEREQUEST_HPP
 
 #include "../Webserv.hpp"
+#include "Getdata.hpp"
+#define Spliter "\r\n\r\n"
+#define SpliterLen 4
+using namespace std;
 
 class HandleRequest
 {
 	private:
 		
-		std::string method;
-		std::string target;
-		std::string version;
-		std::map<std::string, std::string> headers;
-		std::string message;
+		string method;
+		string target;
+		string version;
+		map<string, string> headers;
+		string message;
+		string Boundary;
+		string queryString;
+		vector<string> data;
+		string body;
 		int code;
 	public:
 		// Constructors
-		HandleRequest(std::string s);
-		void treatSline(std::string);
+		HandleRequest(string s);
+		void treatSline(string);
 		int ckeckSline();
-		void treatHeaders(std::string);
+		int ckeckHeaders();
+		void treatHeaders(string);
+		void splitBody();
 		~HandleRequest();
 		int getCode(void)
 		{
