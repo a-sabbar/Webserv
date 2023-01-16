@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/15 01:59:50 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/15 22:40:42 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ class HandleRequest
 		int ckeckHeaders();
 		void treatHeaders(string);
 		void splitBody();
+		void handleChunked();
 		~HandleRequest();
 		int getCode(void)
 		{
