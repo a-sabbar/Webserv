@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:30 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/16 22:07:36 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/17 20:30:21 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ class client_d
 		bool			isAccept ;
 		bool			endRead;
 		std::string		request;
-		char			buffer[4096];
+		char			buffer[500000];
 		unsigned long	lenRead;
 		unsigned long	lenCont;
 };
