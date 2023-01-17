@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/16 01:40:24 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/17 23:41:37 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,9 @@ HandleRequest::HandleRequest(std::string buff)
 		else if (!headers["Content-Type"].compare("application/octet-stream"))
 			Getdata gt(body,1);
 	}
-	cerr << message << endl;
-	cerr << code << endl;
+	// cout << "-----------------------------" << endl;
+	// cout << message << endl;
+	// cout << code << endl;
 }
 
 int HandleRequest::ckeckSline()
@@ -75,6 +76,7 @@ int HandleRequest::ckeckHeaders()
 		if (temp.find("boundary=") != string::npos)
 		{
 			Boundary = temp.substr(temp.find("boundary=") + 9);
+			// cout << temp << endl;
 			temp = temp.substr(0, temp.find("boundary=") - 2);
 			headers["Content-Type"] = temp;
 		}
