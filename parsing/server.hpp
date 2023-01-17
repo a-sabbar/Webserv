@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:30 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/14 09:57:33 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/16 22:07:36 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,12 @@ class client_d
 		int 			acceptFd;
 		int 			socketFd;
 		bool 			endSend;
-		bool			isAccept;
+		bool			isAccept ;
 		bool			endRead;
 		std::string		request;
-		char			buffer[300];
-		unsigned long	lenRead; 
+		char			buffer[4096];
+		unsigned long	lenRead;
+		unsigned long	lenCont;
 };
 
 class serv_d
