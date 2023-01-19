@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run_server.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/18 20:29:39 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/19 20:39:33 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,6 +230,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 							std::cout << "---------------------->  Get" << std::endl;
 							it_c->endRead = true;
 						}
+
 					}
 					if(m == 2)
 					{
@@ -239,9 +240,10 @@ void    run_server(std::vector<serv_d> &serv_data)
 							it_c->endRead = true;
 							std::cout << "---------------------->  Post" << std::endl;
 							// sleep(1);
-							HandleRequest h(it_c->request);		
+							HandleRequest h(it_c->request);	
 						}
 					}
+						// std::cout << it_c->request << std::endl;
 				}
 				else if (fds.at(i).revents & POLLOUT) {
 					std::vector<client_d> ::iterator it_c = addNewFd.begin();
