@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/15 01:42:02 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/18 00:41:39 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/19 23:38:58 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void Getdata::getFileName(string str)
 void Getdata::CreatFill(string data)
 {
 	ofstream out;
-	string g = "/Users/zait-sli/Desktop/Webser/upload/" + fileName;
+	string g = "./upload/" + fileName;
 	out.open(g);
 	out << data;
 	out.close();

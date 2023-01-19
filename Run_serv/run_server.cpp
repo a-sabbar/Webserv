@@ -6,12 +6,18 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2023/01/18 00:25:52 by zait-sli         ###   ########.fr       */
+=======
+/*   Updated: 2023/01/19 20:39:33 by zait-sli         ###   ########.fr       */
+>>>>>>> main
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../Webserv.hpp"
 #include <fcntl.h>
+#include <algorithm>
+
 
 void myTrim(std::string &s, const std::string &toTrim = " \t\f\v\n\r")
 {
@@ -29,20 +35,22 @@ void testCnnection (int item)
 	return ;
 }
 
-struct pollfd  Accept_read(std::vector<serv_d> &servers, int i, std::vector<client_d> &addNewFd)
+struct pollfd  Accept_read(std::vector<serv_d> &servers, int i, std::vector<client_d> &addNewFd, int fd)
 {
-	struct sockaddr_in address = servers.at(i).address;
-	int addrlen = sizeof(address);
+	int addrlen = sizeof(servers.at(i).address);
 	struct pollfd temp;
 	client_d newFd;
 
 	servers.at(i).is_accept = true;
 	// printf("fd sock:  %d\n", servers.at(i).sock);
-	temp.fd = accept(servers.at(i).sock, (sockaddr *)&address, (socklen_t *)&addrlen);
+	temp.fd = accept(fd, (sockaddr *)&servers.at(i).address, (socklen_t *)&addrlen);
+	fcntl(temp.fd , F_SETFL, O_NONBLOCK);
 	temp.events = POLLIN | POLLOUT; 
 	temp.revents = 0;
+
+	
 	newFd.acceptFd = temp.fd;
-	newFd.socketFd = servers.at(i).sock;
+	newFd.socketFd = fd;
 	newFd.lenRead = 0;
 	newFd.endSend = false;
 	newFd.isAccept = false;
@@ -74,32 +82,30 @@ int get_content_len(std::string request)
 
 
 
-void clearPollList(std::vector<serv_d> &servers, std::vector <struct pollfd> &fds, client_d client, std::vector <client_d> &addNewFd)
+void clearPollList(std::vector <struct pollfd> &fds, client_d client, std::vector <client_d> &addNewFd)
 {
-	if(servers.size())
-	{
-		std::vector<serv_d>::iterator it_s = servers.begin();
-		while(it_s->sock != client.socketFd && it_s != servers.end())
-			it_s++;
-		if(it_s->sock == client.socketFd)
-			it_s->is_accept = false;
-	}
 	if(fds.size())
 	{
-		
+		std::cout << "before :  "<< fds.size() << "\n";
 		std::vector<struct pollfd>::iterator it_poll = fds.begin();
 		while(it_poll->fd != client.acceptFd && it_poll != fds.end())
 			it_poll++;
 		if(it_poll->fd == client.acceptFd)
 			fds.erase(it_poll);
+		std::cout << "after :  "<< fds.size() << "\n";	
 	}
 	if(addNewFd.size())
 	{
 		std::vector <client_d>::iterator it_client = addNewFd.begin();
 		while(it_client->socketFd != client.socketFd && it_client != addNewFd.end() )
 			it_client++;
-		if(it_client->socketFd == client.socketFd)
+		if(it_client->acceptFd == client.acceptFd)
 			addNewFd.erase(it_client);
+		if(addNewFd.size() == 1)
+		{
+			std::cout <<"    -------> hello";
+			addNewFd.clear();
+		}
 	}
 }
 
@@ -154,10 +160,15 @@ void    run_server(std::vector<serv_d> &serv_data)
 			continue ;
 		}
 	}
+	std::vector <int> serverSocket;
     for (it = serv_data.begin(); it < serv_data.end(); it++)
 	{
 		if(it->listening != -1 && it->connection != -1 && it->sock != -1 )
+		{
+			fcntl(it->sock, F_SETFL, O_NONBLOCK);
 			servers.push_back(*it);
+			serverSocket.push_back(it->sock);
+		}
 	}
 	std::vector <struct pollfd> fds;
 	std::vector <client_d> addNewFd;
@@ -174,6 +185,8 @@ void    run_server(std::vector<serv_d> &serv_data)
 	std::cout << "============== WAITING ==============\n";
 	while(1)
 	{
+		
+		std::cout << "============== POLL ==============\n";
 		int ret = poll(&fds[0], fds.size(), -1);
 		if (ret == -1)
 		{
@@ -182,17 +195,19 @@ void    run_server(std::vector<serv_d> &serv_data)
 		}
 		else if (ret > 0)
 		{
+			
 			for (size_t i = 0; i < fds.size(); i++)
 			{
 
-				if(i < servers.size() && servers.at(i).is_accept == false && fds.at(i).revents)
+				// std::cout <<"poll : " << fds.at(i).fd << " -  "<< fds.at(i).revents << std::endl;
+				if (fds.at(i).revents & POLLIN)
 				{
-					std::cout << "============== START ==============\n";
-					std::cout <<"accept : " << servers.at(i).sock <<std::endl;
-					fds.push_back(Accept_read(servers, i, addNewFd));
-				}
-				else if (fds.at(i).revents & POLLIN)
-				{
+					if (find(serverSocket.begin(), serverSocket.end(), fds.at(i).fd) != serverSocket.end()) 
+					{
+						std::cout << "============== START ==============\n";
+						fds.push_back(Accept_read(servers, i, addNewFd, fds.at(i).fd));
+						std::cout <<"accept : " << servers.at(i).sock << " -  "<< (fds.end() - 1)->fd <<std::endl;
+					}
 					std::vector<client_d> ::iterator it_c = addNewFd.begin();
 					for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
 						it_c++;
@@ -201,14 +216,13 @@ void    run_server(std::vector<serv_d> &serv_data)
 						continue;
 					}
 					bzero(it_c->buffer, sizeof(it_c->buffer));
-					puts("read");
 					int rec =  recv(fds.at(i).fd, it_c->buffer, sizeof(it_c->buffer), 0);
-					// printf("-----fd : %d   %d-----> read :  %d\n", it_c->acceptFd, fds.at(i).fd, rec);
-					if(rec == -1)
+					puts("read");
+					if(rec < 1)
 					{
 						std::cout <<"hello by"<<std::endl;
 						close(fds.at(i).fd);
-						clearPollList(servers, fds, *it_c, addNewFd);
+						clearPollList(fds, *it_c, addNewFd);
 						break ;
 					}
 					it_c->request.append(it_c->buffer, rec);
@@ -216,20 +230,24 @@ void    run_server(std::vector<serv_d> &serv_data)
 					int m = get_method(it_c->request);
 					if(m == 1)
 					{
-						if(it_c->request.find("\r\n\r\n") != std::string::npos && it_c->request.length()){
+						if(it_c->request.find("\r\n\r\n") != std::string::npos){
+							std::cout << "---------------------->  Get" << std::endl;
 							it_c->endRead = true;
 						}
+
 					}
 					if(m == 2)
 					{
 						int len = get_content_len(it_c->request);
-						if(it_c->lenRead >= (unsigned long)len && it_c->request.length() )
+						if(it_c->lenRead >= (unsigned long)len )
 						{
 							it_c->endRead = true;
-							// std::cout << it_c->request << std::endl;
-							HandleRequest h(it_c->request);		
+							std::cout << "---------------------->  Post" << std::endl;
+							// sleep(1);
+							HandleRequest h(it_c->request);	
 						}
 					}
+						// std::cout << it_c->request << std::endl;
 				}
 				else if (fds.at(i).revents & POLLOUT) {
 					std::vector<client_d> ::iterator it_c = addNewFd.begin();
@@ -241,20 +259,9 @@ void    run_server(std::vector<serv_d> &serv_data)
 					}
 					if(it_c->endRead)
 					{
-					// 	it_c->lenRead = 0;
-					// 	send(fds.at(i).fd, "hello wy server", 15, 0);
-					// 	close(fds.at(i).fd);
-					// 	clearPollList(servers, fds, *it_c,addNewFd);
-					// }
-				// }
-					// 	HandleRequest h(it_c->request);								///////   HandleRequest
-						// }	
-					
-
-						// std::cout << h.getCode() << std::end``l;						///////   HandleRequest						
-
-
-
+						// int m = get_method(it_c->request);
+						// if(m == 1)
+						// 	std::cout <<it_c->request<< std::endl; 
 						std::string path = get_path(it_c->request);
 						myTrim(path);
 						std::cout << path << std::endl;
@@ -279,15 +286,14 @@ void    run_server(std::vector<serv_d> &serv_data)
 						}
 						else
 						{
-							// std::cout<< "paaath  : "<< path << std::endl;
 							getline(file , value, '\0');
 							std::string len = std::to_string(value.length());
 							value = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
 						}
 						send(fds.at(i).fd, (char *)value.c_str(), value.length(), 0);
 						close(fds.at(i).fd);
-						clearPollList(servers, fds, *it_c,addNewFd);
-						std::cout <<"============== DONE ==============\n";
+						clearPollList(fds, *it_c,addNewFd);
+						std::cout << fds.size()<<" ============== DONE ==============\n";
 					}
 				}
 			}

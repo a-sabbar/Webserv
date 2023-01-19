@@ -1,6 +1,10 @@
 {
     "files.associations": {
+<<<<<<< HEAD
         "iosfwd": "cpp",
         "string": "cpp"
+=======
+        "vector": "cpp"
+>>>>>>> main
     }
 }

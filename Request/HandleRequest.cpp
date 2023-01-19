@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/18 03:03:55 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/19 23:38:44 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,6 @@ int HandleRequest::ckeckHeaders()
 		if (temp.find("boundary=") != string::npos)
 		{
 			Boundary = temp.substr(temp.find("boundary=") + 9);
-			// cout << temp << endl;
 			temp = temp.substr(0, temp.find("boundary=") - 2);
 			headers["Content-Type"] = temp;
 		}
@@ -116,10 +115,10 @@ void HandleRequest::handleChunked()
 void HandleRequest::splitBody()
 {
 	size_t b=0,nb;
-	string endB = Boundary + "--\n";
-	Boundary += "\n";
-		
-	b = body.find(Boundary, b) + Boundary.length();
+	string endB = Boundary + "---\r\n";
+	Boundary += "\r\n";
+	
+	b = body.find(Boundary, b) + Boundary.length() + 4;
 	body = body.substr(b);
 	b = 0;
 	while (1)
@@ -141,7 +140,6 @@ void HandleRequest::splitBody()
 		// cout << "1==========" << endl;
 		// cout <<*it  <<endl;
 		// cout << it->substr(it->find(Spliter) + SpliterLen)  <<endl;
-		// cout <<it->length()  <<endl;
 		Getdata gt(*it,headers["Content-Type"],0);
 		// cout << "2==========" << endl;
 	}
