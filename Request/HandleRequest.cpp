@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/17 23:41:37 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/18 03:03:55 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,11 @@ HandleRequest::HandleRequest(std::string buff)
 			cout << "Splited the body" << endl;
 			splitBody();
 		}
-		else if (!headers["Content-Type"].compare("application/octet-stream"))
-			Getdata gt(body,1);
+		else if (!headers["Content-Type"].compare("application/octet-stream") || !headers["Content-Type"].compare("application/pdf"))
+		{
+			// cout << "Binary file" << endl;
+			Getdata gt(body,headers["Content-Type"],1);
+		}
 	}
 	// cout << "-----------------------------" << endl;
 	// cout << message << endl;
@@ -139,7 +142,7 @@ void HandleRequest::splitBody()
 		// cout <<*it  <<endl;
 		// cout << it->substr(it->find(Spliter) + SpliterLen)  <<endl;
 		// cout <<it->length()  <<endl;
-		Getdata gt(*it,0);
+		Getdata gt(*it,headers["Content-Type"],0);
 		// cout << "2==========" << endl;
 	}
 }

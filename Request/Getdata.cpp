@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/15 01:42:02 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/17 23:39:39 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/18 00:41:39 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 #include "fstream"
 
 // Constructors
-Getdata::Getdata(string s,bool i)
+Getdata::Getdata(string s,string ct ,bool i)
 {
+	this->ct = ct;
 	if (i == 0)
 	{
 		string firstPart;
@@ -32,6 +33,8 @@ Getdata::Getdata(string s,bool i)
 	else
 	{
 		fileName = "ttttttt";
+		if (ct == "application/pdf")
+			fileName += ".pdf";
 		CreatFill(s);
 	}
 }
