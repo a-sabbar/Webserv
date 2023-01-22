@@ -1,4 +1,4 @@
-/* ************************************************************************** */
+ /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   HandleRequest.cpp                                  :+:      :+:    :+:   */
@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/19 23:38:44 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/20 00:10:06 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ HandleRequest::HandleRequest(std::string buff)
 		}
 		else if (!headers["Content-Type"].compare("application/octet-stream") || !headers["Content-Type"].compare("application/pdf"))
 		{
-			// cout << "Binary file" << endl;
 			Getdata gt(body,headers["Content-Type"],1);
 		}
 	}
@@ -104,6 +103,7 @@ void HandleRequest::handleChunked()
 		dec = strtoul(hexlen.c_str(), NULL, 16);
 		if (dec != 0)
 		{
+			cout <<dec <<"Here" << endl;
 			tbody += body.substr(0, dec);
 			body = body.substr(dec + 2);
 		}
@@ -141,7 +141,6 @@ void HandleRequest::splitBody()
 		// cout <<*it  <<endl;
 		// cout << it->substr(it->find(Spliter) + SpliterLen)  <<endl;
 		Getdata gt(*it,headers["Content-Type"],0);
-		// cout << "2==========" << endl;
 	}
 }
 

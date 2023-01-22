@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/19 23:40:00 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/22 05:24:35 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,17 +223,16 @@ void    run_server(std::vector<serv_d> &serv_data)
 					}
 					it_c->request.append(it_c->buffer, rec);
 					it_c->lenRead += rec;
-					int m = get_method(it_c->request);
-					if(m == 1)
-					{
-						if(it_c->request.find("\r\n\r\n") != std::string::npos){
-							std::cout << "---------------------->  Get" << std::endl;
-							it_c->endRead = true;
-						}
-
-					}
-					if(m == 2)
-					{
+					// int m = get_method(it_c->request);
+					// if(m == 1)
+					// {
+					// 	if(it_c->request.find("\r\n\r\n") != std::string::npos){
+					// 		std::cout << "---------------------->  Get" << std::endl;
+					// 		it_c->endRead = true;
+					// 	}
+					// }
+					// if(m == 2)
+					// {
 						int len = get_content_len(it_c->request);
 						if(it_c->lenRead >= (unsigned long)len )
 						{
@@ -242,7 +241,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 							// sleep(1);
 							HandleRequest h(it_c->request);	
 						}
-					}
+					// }
 						// std::cout << it_c->request << std::endl;
 				}
 				else if (fds.at(i).revents & POLLOUT) {

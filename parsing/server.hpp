@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:30 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/18 10:14:17 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/22 04:56:42 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ class serv_d
 		size_t max_body_size;             //always with B
 		std::string server_name;
 		struct sockaddr_in address;
+		std::map<std::string,std::map<std::string, std::vector<std::string> > > locations;
 
 		
 		serv_d();
