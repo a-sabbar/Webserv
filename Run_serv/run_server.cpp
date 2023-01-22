@@ -6,14 +6,14 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/20 17:33:07 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/22 14:16:45 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../Webserv.hpp"
 #include <fcntl.h>
 #include <algorithm>
-int nfds = 0;
+
 
 void myTrim(std::string &s, const std::string &toTrim = " \t\f\v\n\r")
 {
@@ -52,7 +52,6 @@ struct pollfd  Accept_read(std::vector<serv_d> &servers, int i, std::vector<clie
 	newFd.isAccept = false;
 	newFd.endRead = false;
 	addNewFd.push_back(newFd);
-	nfds++;
 	return(temp);
 }
 
@@ -81,23 +80,29 @@ int get_content_len(std::string request)
 
 void clearPollList(std::vector <struct pollfd> &fds, client_d client, std::vector <client_d> &addNewFd)
 {
-
-	std::cout << "before :  "<< fds.size() << "\n";
-	std::vector<struct pollfd>::iterator it_poll = fds.begin();
-	while(it_poll->fd != client.acceptFd && it_poll != fds.end())
-		it_poll++;
-	if(it_poll->fd == client.acceptFd)
-		fds.erase(it_poll);
-	std::cout << "after :  "<< fds.size() << "\n";	
-
-	
-	std::vector <client_d>::iterator it_client = addNewFd.begin();
-	while(it_client->socketFd != client.socketFd && it_client != addNewFd.end() )
-		it_client++;
-	if(it_client->acceptFd == client.acceptFd)
-		addNewFd.erase(it_client);
-
-	nfds--;
+	if(fds.size())
+	{
+		std::cout << "before :  "<< fds.size() << "\n";
+		std::vector<struct pollfd>::iterator it_poll = fds.begin();
+		while(it_poll->fd != client.acceptFd && it_poll != fds.end())
+			it_poll++;
+		if(it_poll->fd == client.acceptFd)
+			fds.erase(it_poll);
+		std::cout << "after :  "<< fds.size() << "\n";	
+	}
+	if(addNewFd.size())
+	{
+		std::vector <client_d>::iterator it_client = addNewFd.begin();
+		while(it_client->socketFd != client.socketFd && it_client != addNewFd.end() )
+			it_client++;
+		if(it_client->acceptFd == client.acceptFd)
+			addNewFd.erase(it_client);
+		if(addNewFd.size() == 1)
+		{
+			std::cout <<"    -------> hello";
+			addNewFd.clear();
+		}
+	}
 }
 
 
@@ -159,11 +164,11 @@ void    run_server(std::vector<serv_d> &serv_data)
 			fcntl(it->sock, F_SETFL, O_NONBLOCK);
 			servers.push_back(*it);
 			serverSocket.push_back(it->sock);
-
 		}
 	}
 	std::vector <struct pollfd> fds;
 	std::vector <client_d> addNewFd;
+	int nfds = 0;
     for (it = servers.begin(); it < servers.end(); it++)
 	{
 		struct pollfd temp;
@@ -176,14 +181,9 @@ void    run_server(std::vector<serv_d> &serv_data)
 	std::cout << "============== WAITING ==============\n";
 	while(1)
 	{
+		
 		std::cout << "============== POLL ==============\n";
-		int ret = poll(&fds[0], nfds, -1);
-		int t =-1;
-		while(++t < nfds)
-		{
-			std::cout << "------------ >  "<<fds[t].fd << "   " << fds[t].revents << "\n";
-		}
-		// exit(0);
+		int ret = poll(&fds[0], fds.size(), -1);
 		if (ret == -1)
 		{
 			std::cout << "error :" << std::endl;
@@ -191,83 +191,53 @@ void    run_server(std::vector<serv_d> &serv_data)
 		}
 		else if (ret > 0)
 		{
+			
 			for (size_t i = 0; i < fds.size(); i++)
 			{
-
 				if (fds.at(i).revents & POLLIN)
 				{
 					if (find(serverSocket.begin(), serverSocket.end(), fds.at(i).fd) != serverSocket.end()) 
 					{
+						std::cout << "============== START ==============\n";
 						fds.push_back(Accept_read(servers, i, addNewFd, fds.at(i).fd));
 						std::cout <<"accept : " << servers.at(i).sock << " -  "<< (fds.end() - 1)->fd <<std::endl;
-						// break;
 					}
-					else
-					{
-						puts("IN");
-						std::vector<client_d> ::iterator it_c = addNewFd.begin();
-						for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd;){
-							it_c++;
-						}
-						if (it_c == addNewFd.end()) {
-							puts("continue");
-							// std::cout <<"poll IN: " << fds.at(i).fd << " -  "<< fds.at(i).revents << std::endl;
-							// sleep(1);
-
-							std::vector<struct pollfd> ::iterator it_fds = fds.begin(); 
-							it_fds += i;
-							
-							fds.erase(it_fds);
-							continue;
-						}
-						bzero(it_c->buffer, sizeof(it_c->buffer));
-						std::cout << "============== READ ==============\n";
-						int rec =  recv(fds.at(i).fd, it_c->buffer, sizeof(it_c->buffer), 0);
-						puts("read");
-						if(rec < 1)
-						{
-							std::cout <<"hello by"<<std::endl;
-							close(fds.at(i).fd);
-							clearPollList(fds, *it_c, addNewFd);
-							break ;
-						}
-						it_c->request.append(it_c->buffer, rec);
-						it_c->lenRead += rec;
-						int m = get_method(it_c->request);
-						if(m == 1)
-						{
-							if(it_c->request.find("\r\n\r\n") != std::string::npos){
-								std::cout << "---------------------->  Get" << std::endl;
-								it_c->endRead = true;
-							}
-						}
-						if(m == 2)
-						{
-							int len = get_content_len(it_c->request);
-							if(it_c->lenRead >= (unsigned long)len )
-							{
-								it_c->endRead = true;
-								std::cout << "---------------------->  Post" << std::endl;
-								// sleep(1);
-								HandleRequest h(it_c->request);		
-							}
-						}
-						std::cout << it_c->request << std::endl;
-					}
-				}
-				if (fds.at(i).revents & POLLOUT) {
-					puts("OUT");
 					std::vector<client_d> ::iterator it_c = addNewFd.begin();
 					for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
 						it_c++;
 					}
 					if (it_c == addNewFd.end()) {
-						std::vector<struct pollfd> ::iterator it_fds = fds.begin(); 
-						it_fds += i;
-						fds.erase(it_fds);
 						continue;
 					}
-					std::cout << it_c->request << std::endl;
+					bzero(it_c->buffer, sizeof(it_c->buffer));
+					int rec =  recv(fds.at(i).fd, it_c->buffer, sizeof(it_c->buffer), 0);
+					puts("read");
+					if(rec < 1)
+					{
+						std::cout <<"hello by"<<std::endl;
+						close(fds.at(i).fd);
+						clearPollList(fds, *it_c, addNewFd);
+						break ;
+					}
+					it_c->request.append(it_c->buffer, rec);
+					it_c->lenRead += rec;
+					int len = get_content_len(it_c->request);
+					if(it_c->lenRead >= (unsigned long)len )
+					{
+						it_c->endRead = true;
+						for (it = servers.begin(); it->sock != it_c->socketFd; it++);
+						// std::cout << "---------------------->  Post" << std::endl;
+						HandleRequest h(it_c->request, *it);	
+					}
+				}
+				else if (fds.at(i).revents & POLLOUT) {
+					std::vector<client_d> ::iterator it_c = addNewFd.begin();
+					for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
+						it_c++;
+					}
+					if (it_c == addNewFd.end()) {
+						continue;
+					}
 					if(it_c->endRead)
 					{
 						std::string path = get_path(it_c->request);
@@ -298,15 +268,14 @@ void    run_server(std::vector<serv_d> &serv_data)
 							std::string len = std::to_string(value.length());
 							value = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
 						}
-						std::cout << "============== SEND ==============\n";
 						send(fds.at(i).fd, (char *)value.c_str(), value.length(), 0);
 						close(fds.at(i).fd);
-						clearPollList(fds, *it_c, addNewFd);
+						clearPollList(fds, *it_c,addNewFd);
 						std::cout << fds.size()<<" ============== DONE ==============\n";
 					}
 				}
 			}
-			sleep(2);
+			// sleep(3);
 		}
 	}
 	

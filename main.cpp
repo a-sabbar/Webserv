@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/19 10:42:44 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/19 17:04:55 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/22 04:56:13 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,11 +35,25 @@ int main(int ac, char **av)
     {
         // parse Parsing(arg);
         // run_server(Parsing.getServer());
-        
-        
+        map<string,vector<string> > lMap;
+        vector<string> tVec;
+
+        tVec.push_back("on");
+        lMap["autoindex"] = tVec;        
+        lMap["upload_enable"] = tVec;
+        tVec.clear();
+        tVec.push_back("/upload"); 
+        lMap["upload_store"] = tVec;       
+        tVec.clear();
+        tVec.push_back("GET");
+        tVec.push_back("POST");
+        lMap["allow_methods"] = tVec;
+         
         
         std::vector<serv_d> test;
         serv_d s1;
+
+        s1.locations["/"] = lMap;
 
         s1.set_host("127.0.0.1");
         s1.set_listen("80");
@@ -77,10 +91,10 @@ int main(int ac, char **av)
         s5.set_root("/Users/asabbar/Desktop/websrv/public");
     
         test.push_back(s1);
-        // test.push_back(s2);
-        // test.push_back(s3);
-        // test.push_back(s4);
-        // test.push_back(s5);
+        test.push_back(s2);
+        test.push_back(s3);
+        test.push_back(s4);
+        test.push_back(s5);
         run_server(test);
         
     }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleRequest.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/15 01:59:50 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/22 14:15:19 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,23 +32,24 @@ class HandleRequest
 		string queryString;
 		vector<string> data;
 		string body;
+		map<string,map<string, vector<string> > > locations;
 		int code;
+		
 	public:
-		// Constructors
-		HandleRequest(string s);
+
+		HandleRequest(string s, serv_d server);
 		void treatSline(string);
 		int ckeckSline();
 		int ckeckHeaders();
 		void treatHeaders(string);
 		void splitBody();
+		void checkLoctaions();
+		void handleChunked();
 		~HandleRequest();
 		int getCode(void)
 		{
 			return code;
-		}
-		
-		
-		
+		}	
 };
 
 #endif

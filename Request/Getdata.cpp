@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/15 01:42:02 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/15 02:22:21 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/19 23:38:58 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,32 +14,43 @@
 #include "fstream"
 
 // Constructors
-Getdata::Getdata(string s)
+Getdata::Getdata(string s,string ct ,bool i)
 {
-	string firstPart;
-	string data;
-	int sp = s.find(Spliter);
-	firstPart = s.substr(0,sp);
-	data = s.substr(sp + SpliterLen);
-	if (firstPart.find("filename=") != string::npos && firstPart.find("filename=\"\"") == string::npos)
+	this->ct = ct;
+	if (i == 0)
 	{
-		getFileName(firstPart);
-		CreatFill(data);
+		string firstPart;
+		string data;
+		int sp = s.find(Spliter);
+		firstPart = s.substr(0,sp);
+		data = s.substr(sp + SpliterLen);
+		if (firstPart.find("filename=") != string::npos && firstPart.find("filename=\"\"") == string::npos)
+		{
+			getFileName(firstPart);
+			CreatFill(data);
+		}
+	}
+	else
+	{
+		fileName = "ttttttt";
+		if (ct == "application/pdf")
+			fileName += ".pdf";
+		CreatFill(s);
 	}
 }
 
 
 void Getdata::getFileName(string str)
 {
-	int t = str.find("filename=") + 10;
+	size_t t = str.find("filename=") + 10;
 	fileName  = str.substr(t, str.find_first_of("\"", t) - t);
-	cout << fileName << endl;
 }
 
 void Getdata::CreatFill(string data)
 {
 	ofstream out;
-	out.open(fileName);
+	string g = "./upload/" + fileName;
+	out.open(g);
 	out << data;
 	out.close();
 }
