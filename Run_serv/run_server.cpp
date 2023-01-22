@@ -6,7 +6,11 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2023/01/22 05:24:35 by zait-sli         ###   ########.fr       */
+=======
+/*   Updated: 2023/01/22 14:16:45 by asabbar          ###   ########.fr       */
+>>>>>>> main
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,8 +198,6 @@ void    run_server(std::vector<serv_d> &serv_data)
 			
 			for (size_t i = 0; i < fds.size(); i++)
 			{
-
-				// std::cout <<"poll : " << fds.at(i).fd << " -  "<< fds.at(i).revents << std::endl;
 				if (fds.at(i).revents & POLLIN)
 				{
 					if (find(serverSocket.begin(), serverSocket.end(), fds.at(i).fd) != serverSocket.end()) 
@@ -223,6 +225,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 					}
 					it_c->request.append(it_c->buffer, rec);
 					it_c->lenRead += rec;
+<<<<<<< HEAD
 					// int m = get_method(it_c->request);
 					// if(m == 1)
 					// {
@@ -243,6 +246,16 @@ void    run_server(std::vector<serv_d> &serv_data)
 						}
 					// }
 						// std::cout << it_c->request << std::endl;
+=======
+					int len = get_content_len(it_c->request);
+					if(it_c->lenRead >= (unsigned long)len )
+					{
+						it_c->endRead = true;
+						for (it = servers.begin(); it->sock != it_c->socketFd; it++);
+						// std::cout << "---------------------->  Post" << std::endl;
+						HandleRequest h(it_c->request, *it);	
+					}
+>>>>>>> main
 				}
 				else if (fds.at(i).revents & POLLOUT) {
 					std::vector<client_d> ::iterator it_c = addNewFd.begin();
@@ -254,9 +267,6 @@ void    run_server(std::vector<serv_d> &serv_data)
 					}
 					if(it_c->endRead)
 					{
-						// int m = get_method(it_c->request);
-						// if(m == 1)
-						// 	std::cout <<it_c->request<< std::endl; 
 						std::string path = get_path(it_c->request);
 						myTrim(path);
 						std::cout << path << std::endl;

@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/22 05:18:05 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/23 00:37:51 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ class HandleRequest
 		
 	public:
 
-		HandleRequest(string s);
+		HandleRequest(string s, serv_d server);
 		void treatSline(string);
 		int ckeckSline();
 		int ckeckHeaders();

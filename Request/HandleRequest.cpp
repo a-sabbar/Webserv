@@ -1,4 +1,4 @@
- /* ************************************************************************** */
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   HandleRequest.cpp                                  :+:      :+:    :+:   */
@@ -6,15 +6,25 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/20 00:10:06 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/23 00:37:59 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HandleRequest.hpp"
 #include <cstdlib>
 
-HandleRequest::HandleRequest(std::string buff)
+HandleRequest::HandleRequest(std::string buff, serv_d server)
 {
+
+
+	std::cout << server.host << std::endl;
+	std::cout << server.listen << std::endl;
+	std::cout << server.max_body_size << std::endl;
+	std::cout << server.root << std::endl;
+
+
+
+
 	code = 200;
 	message = "Everything is good";
 	std::string startLine = buff.substr(0, buff.find_first_of("\n") -1);
