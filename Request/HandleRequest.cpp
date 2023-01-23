@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/23 00:37:59 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/23 04:19:15 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,11 @@ HandleRequest::HandleRequest(std::string buff, serv_d server)
 {
 
 
-	std::cout << server.host << std::endl;
-	std::cout << server.listen << std::endl;
-	std::cout << server.max_body_size << std::endl;
-	std::cout << server.root << std::endl;
+	// std::cout << server.host << std::endl;
+	locations = server.locations;
+	// std::cout << server.listen << std::endl;
+	// std::cout << server.max_body_size << std::endl;
+	// std::cout << server.root << std::endl;
 
 
 
@@ -31,7 +32,8 @@ HandleRequest::HandleRequest(std::string buff, serv_d server)
 	treatSline(startLine);
 	treatHeaders(buff.substr(startLine.size() + 2,buff.find(Spliter)));
 	ckeckSline();
-	if (code == 200)
+	checkLoctaions();
+	if (code == 200 )
 	{
 		body = buff.substr(buff.find(Spliter) + SpliterLen);
 		ckeckHeaders();
@@ -50,9 +52,9 @@ HandleRequest::HandleRequest(std::string buff, serv_d server)
 			Getdata gt(body,headers["Content-Type"],1);
 		}
 	}
-	// cout << "-----------------------------" << endl;
-	// cout << message << endl;
-	// cout << code << endl;
+	cout << "-----------------------------" << endl;
+	cout << message << endl;
+	cout << code << endl;
 }
 
 int HandleRequest::ckeckSline()
@@ -74,7 +76,7 @@ int HandleRequest::ckeckSline()
 	{
 			
 		message = "Bad Request";
-		code = 404;
+		code = 400;
 		return 1;
 	}
 	return 0;
@@ -95,10 +97,31 @@ int HandleRequest::ckeckHeaders()
 	if (headers["Host"].empty())
 	{
 		message = "Bad Request";
-		code = 404;
+		code = 400;
 		return 1;
 	}
 	return 0;
+}
+
+void HandleRequest::checkRootLoctaion()
+{
+	map<string, vector<string> > rootLoc = locations["/"];
+	vector<string>::iterator it;
+
+	if(rootLoc["upload_enable"].at(0) == "on")
+		upload = 1;
+	it = find(rootLoc["allow_methods"].begin(),rootLoc["allow_methods"].end(),method);
+	if (it == rootLoc["allow_methods"].end())
+	{
+		message = "Method Not Allowed";
+		code = 405;
+	}
+}
+
+void HandleRequest::checkLoctaions()
+{
+	if(locations.size() == 1)
+		checkRootLoctaion();
 }
 
 void HandleRequest::handleChunked()
@@ -113,7 +136,6 @@ void HandleRequest::handleChunked()
 		dec = strtoul(hexlen.c_str(), NULL, 16);
 		if (dec != 0)
 		{
-			cout <<dec <<"Here" << endl;
 			tbody += body.substr(0, dec);
 			body = body.substr(dec + 2);
 		}
