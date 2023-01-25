@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/23 03:35:41 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/25 11:15:15 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,9 @@ class HandleRequest
 		vector<string> data;
 		string body;
 		map<string,map<string, vector<string> > > locations;
+		// serv_d serv;
 		int code;
+		string root;
 		bool upload;
 		
 	public:
@@ -44,6 +46,7 @@ class HandleRequest
 		int ckeckHeaders();
 		void treatHeaders(string);
 		void splitBody();
+		void handleDelte();
 		void checkLoctaions();
 		void checkRootLoctaion();
 		void handleChunked();

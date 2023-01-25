@@ -6,16 +6,19 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/15 01:42:02 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/19 23:38:58 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/25 13:11:04 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Getdata.hpp"
-#include "fstream"
+#include <fstream>
+#include <cstdio> 
 
 // Constructors
-Getdata::Getdata(string s,string ct ,bool i)
+Getdata::Getdata(string s,string ct ,bool i,map<string, vector<string> > rootLoc,string root)
 {
+	this->rootLoc = rootLoc;
+	this->root = root;
 	this->ct = ct;
 	if (i == 0)
 	{
@@ -32,13 +35,25 @@ Getdata::Getdata(string s,string ct ,bool i)
 	}
 	else
 	{
-		fileName = "ttttttt";
+		// RandomName();
+		fileName = RandomName();
 		if (ct == "application/pdf")
 			fileName += ".pdf";
+		else if(ct == "image/png")
+			fileName += ".png";
 		CreatFill(s);
 	}
 }
 
+string Getdata::RandomName(void)
+{
+	char filename1[L_tmpnam];
+	mkstemp(filename1);
+	cout << "Temporary filenames:" << endl;
+	cout << "1. " << filename1 << endl;
+	// return(string(filename1));
+	return("hhhh");
+}
 
 void Getdata::getFileName(string str)
 {
@@ -49,7 +64,11 @@ void Getdata::getFileName(string str)
 void Getdata::CreatFill(string data)
 {
 	ofstream out;
-	string g = "./upload/" + fileName;
+	string g;
+	if (rootLoc["upload_store"].size() == 1)
+		g = root + rootLoc["upload_store"].at(0) + "/" + fileName;
+	else
+		g = root + "/" + fileName;
 	out.open(g);
 	out << data;
 	out.close();

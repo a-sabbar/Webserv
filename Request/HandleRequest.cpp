@@ -6,26 +6,18 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/23 04:19:15 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/25 12:56:58 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HandleRequest.hpp"
 #include <cstdlib>
+#include <cstdio>
 
 HandleRequest::HandleRequest(std::string buff, serv_d server)
 {
-
-
-	// std::cout << server.host << std::endl;
 	locations = server.locations;
-	// std::cout << server.listen << std::endl;
-	// std::cout << server.max_body_size << std::endl;
-	// std::cout << server.root << std::endl;
-
-
-
-
+	root = server.root;
 	code = 200;
 	message = "Everything is good";
 	std::string startLine = buff.substr(0, buff.find_first_of("\n") -1);
@@ -33,23 +25,26 @@ HandleRequest::HandleRequest(std::string buff, serv_d server)
 	treatHeaders(buff.substr(startLine.size() + 2,buff.find(Spliter)));
 	ckeckSline();
 	checkLoctaions();
-	if (code == 200 )
+	if (code == 200)
 	{
 		body = buff.substr(buff.find(Spliter) + SpliterLen);
 		ckeckHeaders();
+		cout << headers["Content-Type"] << endl;
 		if (!headers["Transfer-Encoding"].compare("chunked"))
 		{
 			handleChunked();
 			cout << "Encoding has been handled" << endl;
 		}
+		if(method == "DELETE")
+			handleDelte();
 		if (!headers["Content-Type"].compare("multipart/form-data"))
 		{
 			cout << "Splited the body" << endl;
 			splitBody();
 		}
-		else if (!headers["Content-Type"].compare("application/octet-stream") || !headers["Content-Type"].compare("application/pdf"))
+		else if (!headers["Content-Type"].compare("application/octet-stream") || !headers["Content-Type"].compare("application/pdf") || !headers["Content-Type"].compare("image/png"))
 		{
-			Getdata gt(body,headers["Content-Type"],1);
+			Getdata gt(body,headers["Content-Type"],1,locations["/"],root);
 		}
 	}
 	cout << "-----------------------------" << endl;
@@ -80,6 +75,23 @@ int HandleRequest::ckeckSline()
 		return 1;
 	}
 	return 0;
+}
+
+bool checkExist (const std::string& name) {
+    std::ifstream f(name.c_str());
+    return f.good();
+}
+
+void HandleRequest::handleDelte()
+{
+	if (!checkExist(root + target) || target == "/")
+	{
+		code = 408;
+		message = "Bad Request";
+		return;
+	}
+	string file = root + target;
+	remove(file.c_str());
 }
 
 int HandleRequest::ckeckHeaders()
@@ -172,7 +184,7 @@ void HandleRequest::splitBody()
 		// cout << "1==========" << endl;
 		// cout <<*it  <<endl;
 		// cout << it->substr(it->find(Spliter) + SpliterLen)  <<endl;
-		Getdata gt(*it,headers["Content-Type"],0);
+		Getdata gt(*it,headers["Content-Type"],0,locations["/"],root);
 	}
 }
 
