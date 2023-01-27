@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Getdata.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/15 01:42:06 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/18 00:40:17 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/27 15:27:27 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,15 @@ class Getdata
 		string fileName;
 		string ContnetType;
 		string ct;
+		string root;
+		map<string, vector<string> > rootLoc;
 	public:
 		// Constructors
-		Getdata(string s,string ct,bool);
+		Getdata(string s,string ct,bool,map<string, vector<string> > rootLoc,string root);
 		void getFileName(string Fpart);
 		string getRandomName();
 		void CreatFill(string data);
+		string RandomName(void);
 };
 
 #endif

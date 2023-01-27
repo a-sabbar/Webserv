@@ -1,58 +1,55 @@
- /* ************************************************************************** */
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   HandleRequest.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/20 00:10:06 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/27 15:27:24 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HandleRequest.hpp"
 #include <cstdlib>
+#include <cstdio>
 
 HandleRequest::HandleRequest(std::string buff, serv_d server)
 {
-
-
-	std::cout << server.host << std::endl;
-	std::cout << server.listen << std::endl;
-	std::cout << server.max_body_size << std::endl;
-	std::cout << server.root << std::endl;
-
-
-
-
+	locations = server.locations;
+	root = server.root;
 	code = 200;
 	message = "Everything is good";
 	std::string startLine = buff.substr(0, buff.find_first_of("\n") -1);
 	treatSline(startLine);
 	treatHeaders(buff.substr(startLine.size() + 2,buff.find(Spliter)));
 	ckeckSline();
+	checkLoctaions();
 	if (code == 200)
 	{
 		body = buff.substr(buff.find(Spliter) + SpliterLen);
 		ckeckHeaders();
+		cout << headers["Content-Type"] << endl;
 		if (!headers["Transfer-Encoding"].compare("chunked"))
 		{
 			handleChunked();
 			cout << "Encoding has been handled" << endl;
 		}
+		if(method == "DELETE")
+			handleDelte();
 		if (!headers["Content-Type"].compare("multipart/form-data"))
 		{
 			cout << "Splited the body" << endl;
 			splitBody();
 		}
-		else if (!headers["Content-Type"].compare("application/octet-stream") || !headers["Content-Type"].compare("application/pdf"))
+		else if (!headers["Content-Type"].compare("application/octet-stream") || !headers["Content-Type"].compare("application/pdf") || !headers["Content-Type"].compare("image/png"))
 		{
-			Getdata gt(body,headers["Content-Type"],1);
+			Getdata gt(body,headers["Content-Type"],1,locations["/"],root);
 		}
 	}
-	// cout << "-----------------------------" << endl;
-	// cout << message << endl;
-	// cout << code << endl;
+	cout << "-----------------------------" << endl;
+	cout << message << endl;
+	cout << code << endl;
 }
 
 int HandleRequest::ckeckSline()
@@ -74,10 +71,27 @@ int HandleRequest::ckeckSline()
 	{
 			
 		message = "Bad Request";
-		code = 404;
+		code = 400;
 		return 1;
 	}
 	return 0;
+}
+
+bool checkExist (const std::string& name) {
+    std::ifstream f(name.c_str());
+    return f.good();
+}
+
+void HandleRequest::handleDelte()
+{
+	if (!checkExist(root + target) || target == "/")
+	{
+		code = 408;
+		message = "Bad Request";
+		return;
+	}
+	string file = root + target;
+	remove(file.c_str());
 }
 
 int HandleRequest::ckeckHeaders()
@@ -95,10 +109,31 @@ int HandleRequest::ckeckHeaders()
 	if (headers["Host"].empty())
 	{
 		message = "Bad Request";
-		code = 404;
+		code = 400;
 		return 1;
 	}
 	return 0;
+}
+
+void HandleRequest::checkRootLoctaion()
+{
+	map<string, vector<string> > rootLoc = locations["/"];
+	vector<string>::iterator it;
+
+	if(rootLoc["upload_enable"].at(0) == "on")
+		upload = 1;
+	it = find(rootLoc["allow_methods"].begin(),rootLoc["allow_methods"].end(),method);
+	if (it == rootLoc["allow_methods"].end())
+	{
+		message = "Method Not Allowed";
+		code = 405;
+	}
+}
+
+void HandleRequest::checkLoctaions()
+{
+	if(locations.size() == 1)
+		checkRootLoctaion();
 }
 
 void HandleRequest::handleChunked()
@@ -113,7 +148,6 @@ void HandleRequest::handleChunked()
 		dec = strtoul(hexlen.c_str(), NULL, 16);
 		if (dec != 0)
 		{
-			cout <<dec <<"Here" << endl;
 			tbody += body.substr(0, dec);
 			body = body.substr(dec + 2);
 		}
@@ -150,7 +184,7 @@ void HandleRequest::splitBody()
 		// cout << "1==========" << endl;
 		// cout <<*it  <<endl;
 		// cout << it->substr(it->find(Spliter) + SpliterLen)  <<endl;
-		Getdata gt(*it,headers["Content-Type"],0);
+		Getdata gt(*it,headers["Content-Type"],0,locations["/"],root);
 	}
 }
 

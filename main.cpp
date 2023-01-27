@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/19 10:42:44 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/22 04:56:13 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/27 15:27:14 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ int main(int ac, char **av)
         tVec.clear();
         tVec.push_back("GET");
         tVec.push_back("POST");
+        // tVec.push_back("DELETE");
         lMap["allow_methods"] = tVec;
          
         
@@ -59,7 +60,7 @@ int main(int ac, char **av)
         s1.set_listen("80");
         s1.set_server_name("achraf.com");
         s1.set_max_body_size(999999999);
-        s1.set_root("/Users/asabbar/Desktop/websrv/public");
+        s1.set_root("/Users/zait-sli/Desktop/Webser/Run_serv/html");
 
         serv_d s2;
     
@@ -104,3 +105,4 @@ int main(int ac, char **av)
     }
     return (0);
 }
+

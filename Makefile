@@ -6,7 +6,7 @@ Header1 =  Webserv.hpp Request/HandleRequest.hpp Request/Getdata.hpp
 
 VERSION = -std=c++98  -Wall -Wextra -Werror  -g -fsanitize=address,undefined,integer
 
-# -g -fsanitize=address,undefined,integer
+# -g -fsanitize=address,undefined,integer 
 
 SRC =	main.cpp	\
 		parsing/server.cpp	\
