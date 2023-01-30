@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:30 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/27 15:25:10 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/30 11:51:03 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,9 @@ public:
 	char buffer[500000];
 	unsigned long lenRead;
 	unsigned long lenCont;
+	std::string Respons;
+	size_t ResponsLength;
+	bool Con; // 0 close, 1 keep allive
 };
 
 class serv_d

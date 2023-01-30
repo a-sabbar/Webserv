@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/25 12:56:58 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/30 11:50:22 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,19 @@
 #include <cstdlib>
 #include <cstdio>
 
-HandleRequest::HandleRequest(std::string buff, serv_d server)
+HandleRequest::HandleRequest(client_d &client, serv_d &server)
 {
+	string buff = client.request;
 	locations = server.locations;
 	root = server.root;
-	code = 200;
-	message = "Everything is good";
+	code = "200";
+	message = "OK";
 	std::string startLine = buff.substr(0, buff.find_first_of("\n") -1);
 	treatSline(startLine);
 	treatHeaders(buff.substr(startLine.size() + 2,buff.find(Spliter)));
 	ckeckSline();
 	checkLoctaions();
-	if (code == 200)
+	if (code == "200")
 	{
 		body = buff.substr(buff.find(Spliter) + SpliterLen);
 		ckeckHeaders();
@@ -35,6 +36,8 @@ HandleRequest::HandleRequest(std::string buff, serv_d server)
 			handleChunked();
 			cout << "Encoding has been handled" << endl;
 		}
+		if (method == "GET")
+			handleGet();
 		if(method == "DELETE")
 			handleDelte();
 		if (!headers["Content-Type"].compare("multipart/form-data"))
@@ -48,8 +51,15 @@ HandleRequest::HandleRequest(std::string buff, serv_d server)
 		}
 	}
 	cout << "-----------------------------" << endl;
-	cout << message << endl;
-	cout << code << endl;
+	generateResponse();
+	client.Respons = Response;
+	client.ResponsLength = Response.length();
+	if (headers["Connection"] == "keep-alive")
+		client.Con = 1;
+	else 
+		client.Con = 0;
+	// cout << Response<< endl;
+	// cout << code << endl;
 }
 
 int HandleRequest::ckeckSline()
@@ -57,21 +67,21 @@ int HandleRequest::ckeckSline()
 	if (method != "GET" && method != "POST" && method != "DELETE")
 	{
 		message = "Not Implemented";
-		code = 501;
+		code = "501";
 		return 1;
 	}
 	else if (version != "HTTP/1.1")
 	{
 			
 		message = "HTTP Version Not Supported";
-		code = 505;
+		code = "505";
 		return 1;
 	}
 	else if (target.at(0) != '/')
 	{
 			
 		message = "Bad Request";
-		code = 400;
+		code = "400";
 		return 1;
 	}
 	return 0;
@@ -82,11 +92,37 @@ bool checkExist (const std::string& name) {
     return f.good();
 }
 
+string ReadFile(string File){	
+	ifstream myfile; 
+	stringstream ss;
+
+	myfile.open(File);
+	ss << myfile.rdbuf();
+	myfile.close();
+	return ss.str();
+}
+
+void HandleRequest::handleGet()
+{
+	cout << target << endl;
+	if (target == "/")
+		ResBody = ReadFile(root + "/home.html");
+	else if (!checkExist(root + target))
+	{
+		code = "404";
+		message = "Not Found";
+		ResBody = ReadFile(root + "/error404.html");
+		return;
+	}
+	else
+		ResBody = ReadFile(root + target);
+}
+
 void HandleRequest::handleDelte()
 {
 	if (!checkExist(root + target) || target == "/")
 	{
-		code = 408;
+		code = "408";
 		message = "Bad Request";
 		return;
 	}
@@ -109,7 +145,7 @@ int HandleRequest::ckeckHeaders()
 	if (headers["Host"].empty())
 	{
 		message = "Bad Request";
-		code = 400;
+		code = "400";
 		return 1;
 	}
 	return 0;
@@ -126,7 +162,7 @@ void HandleRequest::checkRootLoctaion()
 	if (it == rootLoc["allow_methods"].end())
 	{
 		message = "Method Not Allowed";
-		code = 405;
+		code = "405";
 	}
 }
 
@@ -196,7 +232,10 @@ void HandleRequest::treatSline(std::string startLine)
 	startLine = startLine.substr(target.size() + 1);
 	version = startLine.substr(0,startLine.find_first_of(" "));
 	if (target.find("?") != std::string::npos)
+	{
 		queryString = target.substr(target.find("?"));
+		target = target.substr(0,target.find("?"));
+	}
 }
 
 void mytrim(std::string &s, const std::string &toTrim = " \t\f\v\n\r")
@@ -207,13 +246,13 @@ void mytrim(std::string &s, const std::string &toTrim = " \t\f\v\n\r")
 
 void HandleRequest::treatHeaders(std::string hd)
 {
-	std::stringstream ss(hd);
-    std::string line;
-    while (std::getline(ss, line)) {
+	stringstream ss(hd);
+    string line;
+    while (getline(ss, line)) {
         size_t pos = line.find(':');
-        if (pos != std::string::npos) {
-            std::string key = line.substr(0, pos);
-            std::string value = line.substr(pos + 2);
+        if (pos != string::npos) {
+            string key = line.substr(0, pos);
+            string value = line.substr(pos + 2);
 			mytrim(value);
             headers[key] = value;
         }
@@ -223,6 +262,7 @@ HandleRequest::~HandleRequest()
 {
 	
 }
+
 
 ///check request line => methode $$ uri.at(0) = '/' && http version || query string ?key=value&&key=value
 ///check headrs host !bad request &&  if(post)=> content lenght && content type && content lenght transfer encoded chencd

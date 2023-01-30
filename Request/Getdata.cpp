@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/15 01:42:02 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/25 13:11:04 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/30 09:58:14 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ void Getdata::CreatFill(string data)
 		g = root + rootLoc["upload_store"].at(0) + "/" + fileName;
 	else
 		g = root + "/" + fileName;
+	cout << g <<endl;
 	out.open(g);
 	out << data;
 	out.close();

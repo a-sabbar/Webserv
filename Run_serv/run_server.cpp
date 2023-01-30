@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run_server.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/27 15:17:00 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/30 10:18:45 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,7 +215,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 					{
 						it_c->endRead = true;
 						for (it = servers.begin(); it->sock != it_c->socketFd; it++);
-						HandleRequest h(it_c->request, *it);	
+						HandleRequest h(*it_c, *it);	
 					}
 				}
 				else if (fds.at(i).revents & POLLOUT) {
@@ -228,34 +228,34 @@ void    run_server(std::vector<serv_d> &serv_data)
 					}
 					if(it_c->endRead)
 					{
-						std::string path = get_path(it_c->request);
-						myTrim(path);
-						std::string value;
-						std::ifstream  file;
-						std::ifstream  fileError;
-						file.open("Run_serv/html" + path);
-						if(!path.compare("/"))
-						{
-							fileError.open("Run_serv/html/home.html");
-							getline(fileError , value, '\0');
-							std::string len = std::to_string(value.length());
-							value = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
-						}
-						else if(!file.is_open())
-						{
-							puts("error KO :(\n");
-							fileError.open("Run_serv/html/error404.html");
-							getline(fileError , value, '\0');
-							std::string len = std::to_string(value.length());
-							value = "HTTP/1.1 404 KO\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
-						}
-						else
-						{
-							getline(file , value, '\0');
-							std::string len = std::to_string(value.length());
-							value = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
-						}
-						send(fds.at(i).fd, (char *)value.c_str(), value.length(), 0);
+						// std::string path = get_path(it_c->request);
+						// myTrim(path);
+						// std::string value;
+						// std::ifstream  file;
+						// std::ifstream  fileError;
+						// file.open("Run_serv/html" + path);
+						// if(!path.compare("/"))
+						// {
+						// 	fileError.open("Run_serv/html/home.html");
+						// 	getline(fileError , value, '\0');
+						// 	std::string len = std::to_string(value.length());
+						// 	value = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
+						// }
+						// else if(!file.is_open())
+						// {
+						// 	puts("error KO :(\n");
+						// 	fileError.open("Run_serv/html/error404.html");
+						// 	getline(fileError , value, '\0');
+						// 	std::string len = std::to_string(value.length());
+						// 	value = "HTTP/1.1 404 KO\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
+						// }
+						// else
+						// {
+						// 	getline(file , value, '\0');
+						// 	std::string len = std::to_string(value.length());
+						// 	value = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
+						// }
+						send(fds.at(i).fd, (char *)it_c->Respons.c_str(), it_c->Respons.length(), 0);
 						close(fds.at(i).fd);
 						clearPollList(fds, *it_c,addNewFd);
 						std::cout << fds.size()<<" ============== DONE ==============\n";

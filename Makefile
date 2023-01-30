@@ -2,7 +2,7 @@ NAME = webser
 
 GG = c++
 
-Header1 =  Webserv.hpp Request/HandleRequest.hpp Request/Getdata.hpp	
+Header1 =  Webserv.hpp Request/HandleRequest.hpp Request/Getdata.hpp
 
 VERSION = -std=c++98  -Wall -Wextra -Werror  -g -fsanitize=address,undefined,integer
 
@@ -13,6 +13,7 @@ SRC =	main.cpp	\
 		Run_serv/run_server.cpp	\
 		Request/HandleRequest.cpp	\
 		Request/Getdata.cpp	\
+		Request/Response.cpp	\
 
 OBJECTS = $(SRC:.cpp=.opp)
 
