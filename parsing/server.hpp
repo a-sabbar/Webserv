@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:30 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/30 11:51:03 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/30 12:23:12 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ class client_d
 public:
 	int acceptFd;
 	int socketFd;
-	bool endSend;
 	bool isAccept;
 	bool endRead;
 	std::string request;
@@ -44,6 +43,9 @@ public:
 	std::string Respons;
 	size_t ResponsLength;
 	bool Con; // 0 close, 1 keep allive
+
+	ssize_t sendLen;
+	bool endSend;
 };
 
 class serv_d

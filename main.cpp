@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/19 10:42:44 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/25 11:20:17 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/30 11:57:54 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ int main(int ac, char **av)
         s1.set_listen("80");
         s1.set_server_name("achraf.com");
         s1.set_max_body_size(999999999);
-        s1.set_root("/Users/zait-sli/Desktop/Webser/Run_serv/html");
+        s1.set_root("/Users/asabbar/Desktop/webserv/Run_serv/html");
 
         serv_d s2;
     

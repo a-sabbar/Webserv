@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run_server.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/30 10:18:45 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/30 12:47:24 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,6 @@ void myTrim(std::string &s, const std::string &toTrim = " \t\f\v\n\r")
 	s = s.substr(0, s.find_last_not_of(toTrim) +1);
 }
 
-void testCnnection (int item)
-{
-	if(item < 0)
-	{
-		perror("KO :(\nFailed to connect    : ");
-		exit(1);
-	}
-	return ;
-}
-
 struct pollfd  Accept_read(std::vector<serv_d> &servers, int i, std::vector<client_d> &addNewFd, int fd)
 {
 	int addrlen = sizeof(servers.at(i).address);
@@ -38,7 +28,6 @@ struct pollfd  Accept_read(std::vector<serv_d> &servers, int i, std::vector<clie
 	client_d newFd;
 
 	servers.at(i).is_accept = true;
-	// printf("fd sock:  %d\n", servers.at(i).sock);
 	temp.fd = accept(fd, (sockaddr *)&servers.at(i).address, (socklen_t *)&addrlen);
 	fcntl(temp.fd , F_SETFL, O_NONBLOCK);
 	temp.events = POLLIN | POLLOUT; 
@@ -48,9 +37,13 @@ struct pollfd  Accept_read(std::vector<serv_d> &servers, int i, std::vector<clie
 	newFd.acceptFd = temp.fd;
 	newFd.socketFd = fd;
 	newFd.lenRead = 0;
-	newFd.endSend = false;
 	newFd.isAccept = false;
 	newFd.endRead = false;
+	newFd.sendLen = 0;
+	newFd.ResponsLength = 0;
+	newFd.Con = false;
+	newFd.endSend = false;
+
 	addNewFd.push_back(newFd);
 	return(temp);
 }
@@ -228,37 +221,16 @@ void    run_server(std::vector<serv_d> &serv_data)
 					}
 					if(it_c->endRead)
 					{
-						// std::string path = get_path(it_c->request);
-						// myTrim(path);
-						// std::string value;
-						// std::ifstream  file;
-						// std::ifstream  fileError;
-						// file.open("Run_serv/html" + path);
-						// if(!path.compare("/"))
-						// {
-						// 	fileError.open("Run_serv/html/home.html");
-						// 	getline(fileError , value, '\0');
-						// 	std::string len = std::to_string(value.length());
-						// 	value = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
-						// }
-						// else if(!file.is_open())
-						// {
-						// 	puts("error KO :(\n");
-						// 	fileError.open("Run_serv/html/error404.html");
-						// 	getline(fileError , value, '\0');
-						// 	std::string len = std::to_string(value.length());
-						// 	value = "HTTP/1.1 404 KO\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
-						// }
-						// else
-						// {
-						// 	getline(file , value, '\0');
-						// 	std::string len = std::to_string(value.length());
-						// 	value = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
-						// }
-						send(fds.at(i).fd, (char *)it_c->Respons.c_str(), it_c->Respons.length(), 0);
-						close(fds.at(i).fd);
-						clearPollList(fds, *it_c,addNewFd);
-						std::cout << fds.size()<<" ============== DONE ==============\n";
+						int sizeRead = 6000000;
+						if((ssize_t)it_c->Respons.length() - it_c->sendLen < sizeRead)
+							sizeRead = (ssize_t)it_c->Respons.length() - it_c->sendLen;
+						it_c->sendLen += send(fds.at(i).fd, it_c->Respons.substr(it_c->sendLen).c_str(), sizeRead, 0);
+						if(it_c->sendLen >= (ssize_t)it_c->Respons.length())
+						{
+							close(fds.at(i).fd);
+							clearPollList(fds, *it_c,addNewFd);
+							std::cout << fds.size()<<" ============== DONE ==============\n";
+						}
 					}
 				}
 			}
