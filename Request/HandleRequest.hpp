@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/30 11:28:56 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/01/30 16:06:08 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,5 +64,6 @@ class HandleRequest
 
 string ReadFile(string File);
 bool checkExist (const std::string& name);
+void mytrim(std::string &s, const std::string &toTrim = " \t\f\v\n\r");
 
 #endif

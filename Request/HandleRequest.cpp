@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleRequest.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/30 12:14:00 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/30 18:00:04 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,6 @@ string ReadFile(string File){
 
 void HandleRequest::handleGet()
 {
-	cout << target << endl;
 	if (target == "/")
 		ResBody = ReadFile(root + "/home.html");
 	else if (!checkExist(root + target))
@@ -239,7 +238,7 @@ void HandleRequest::treatSline(std::string startLine)
 	}
 }
 
-void mytrim(std::string &s, const std::string &toTrim = " \t\f\v\n\r")
+void mytrim(std::string &s, const std::string &toTrim)
 {
 	s = s.substr(s.find_first_not_of(toTrim), s.length());
 	s = s.substr(0, s.find_last_not_of(toTrim) +1);
