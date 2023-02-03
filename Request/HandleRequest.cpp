@@ -6,13 +6,18 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/30 18:00:04 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/03 22:29:15 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HandleRequest.hpp"
 #include <cstdlib>
 #include <cstdio>
+
+#include <sys/stat.h>
+#include <cstdlib>
+#include <iostream>
+#include <dirent.h>
 
 HandleRequest::HandleRequest(client_d &client, serv_d &server)
 {
@@ -30,7 +35,7 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 	{
 		body = buff.substr(buff.find(Spliter) + SpliterLen);
 		ckeckHeaders();
-		cout << headers["Content-Type"] << endl;
+		string Type = headers["Content-Type"].substr(0,headers["Content-Type"].find("/"));
 		if (!headers["Transfer-Encoding"].compare("chunked"))
 		{
 			handleChunked();
@@ -45,7 +50,7 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 			cout << "Splited the body" << endl;
 			splitBody();
 		}
-		else if (!headers["Content-Type"].compare("application/octet-stream") || !headers["Content-Type"].compare("application/pdf") || !headers["Content-Type"].compare("image/png"))
+		else if (Type == "application" || Type == "image" || Type == "text")
 		{
 			Getdata gt(body,headers["Content-Type"],1,locations["/"],root);
 		}
@@ -58,8 +63,6 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 		client.Con = 1;
 	else 
 		client.Con = 0;
-	// cout << Response<< endl;
-	// cout << code << endl;
 }
 
 int HandleRequest::ckeckSline()
@@ -87,26 +90,54 @@ int HandleRequest::ckeckSline()
 	return 0;
 }
 
+
+bool ifDir(const std::string& name)
+{
+	DIR *pdir = opendir(name.c_str());
+
+	if(pdir){
+		return 1;
+	}
+	return 0;
+}
+
 bool checkExist (const std::string& name) {
     std::ifstream f(name.c_str());
     return f.good();
 }
 
-string ReadFile(string File){	
+string HandleRequest::ReadFile(string File){	
 	ifstream myfile; 
 	stringstream ss;
-
+	string name;
 	myfile.open(File);
 	ss << myfile.rdbuf();
 	myfile.close();
-	// std::cout << ss.str();
+	name = File.substr(File.find_last_of("/") + 1);
+	BodyCT = GetCT(name);
 	return ss.str();
 }
 
 void HandleRequest::handleGet()
 {
-	if (target == "/")
-		ResBody = ReadFile(root + "/home.html");
+	// location = locations["/"];
+	if (ifDir(root + target) && target != "/")
+	{
+		if (locations["/"]["autoindex"].at(0) == "on")
+		{
+			ResBody = GetIndex(root + target);
+			BodyCT = "text/html";
+		}
+		else
+		{
+			code = "403";
+			message = "Forbidden";
+			ResBody = ReadFile(root + "/403.html");
+		}
+		return ;
+	}
+	else if (target == "/")
+		ResBody = ReadFile(root + "/index.html");
 	else if (!checkExist(root + target))
 	{
 		code = "404";

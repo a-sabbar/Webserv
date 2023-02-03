@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/30 16:06:08 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/03 22:15:06 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ class HandleRequest
 		// serv_d serv;
 		string code;
 		string root;
+		string BodyCT;
 		bool upload;
 		
 	public:
@@ -50,11 +51,13 @@ class HandleRequest
 		int ckeckHeaders();
 		void treatHeaders(string);
 		void splitBody();
+		string ReadFile(string File);
 		void handleDelte();
 		void handleGet();
 		void checkLoctaions();
 		void checkRootLoctaion();
 		void handleChunked();
+		
 		~HandleRequest();
 		string getCode(void)
 		{
@@ -65,5 +68,7 @@ class HandleRequest
 string ReadFile(string File);
 bool checkExist (const std::string& name);
 void mytrim(std::string &s, const std::string &toTrim = " \t\f\v\n\r");
+string GetIndex(string Dir);
+string GetCT(string fileName);
 
 #endif
