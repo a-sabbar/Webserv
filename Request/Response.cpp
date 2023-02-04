@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 11:28:20 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/03 22:32:19 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/04 14:29:00 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,27 +40,42 @@ string GetCT(string fileName)
     return CT;
 }
 
+string getPath(string g, string r)
+{
+    string path;
+    string root;
+    
+    root = r;
+    mytrim(g,"/");    
+    mytrim(root,"/");
+    path = g.substr(root.length());
+    path += "/";
+    cout << path << endl;
+    return path;
+}
 
-
-string GetIndex(string Dir)
+string GetIndex(string Dir,string root)
 {
     string index;
     string name;
+    string path;
 
     DIR *dp;
     struct dirent *ep;     
     dp = opendir (Dir.c_str());
-
+    
+    path = getPath(Dir,root);
+    
     index = "<html> \n";
-    index += "<head><title>Index of " + Dir.substr(Dir.find_last_of("/")) + "/</title></head>\n";
+    index += "<head><title>Index of " + path + "</title></head>\n";
     index += "<body> \n";
-    index += "<h1>Index of " + Dir.substr(Dir.find_last_of("/")) + "/</h1><hr><pre><a href=\"../\">../</a> \n";
+    index += "<h1>Index of " + path + "</h1><hr><pre><a href=\""+ path +"../\">../</a> \n";
 
     while ((ep = readdir (dp)) != NULL)
     { 
         name = string(ep->d_name);
         if (name != "." && name != "..")
-            index += "<a href=\"" + name + "\">" + name + "</a>\n";
+            index += "<a href=\"" + path + name + "\">" + name + "</a>\n";
     }
     (void) closedir (dp);
 

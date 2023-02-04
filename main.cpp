@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/19 10:42:44 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/30 16:08:51 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/04 16:28:33 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ int main(int ac, char **av)
         // parse Parsing(arg);
         // run_server(Parsing.getServer());
         map<string,vector<string> > lMap;
+        map<string,vector<string> > upload;
+        map<string,vector<string> > Mtest;
         vector<string> tVec;
 
         tVec.push_back("on");
@@ -49,12 +51,27 @@ int main(int ac, char **av)
         tVec.push_back("POST");
         // tVec.push_back("DELETE");
         lMap["allow_methods"] = tVec;
-         
+
+        
+        tVec.push_back("on");
+        upload["autoindex"] = tVec;        
+        upload["upload_enable"] = tVec;
+        tVec.clear();
+        tVec.push_back("/upload"); 
+        upload["upload_store"] = tVec;       
+        tVec.clear();
+        tVec.push_back("GET");
+        tVec.push_back("POST");
+        // tVec.push_back("DELETE");
+        upload["allow_methods"] = tVec;
+  
         
         std::vector<serv_d> test;
         serv_d s1;
 
         s1.locations["/"] = lMap;
+        s1.locations["/upload"] = upload;
+        s1.locations["/upload/test"] = Mtest;
 
         s1.set_host("127.0.0.1");
         s1.set_listen("80");

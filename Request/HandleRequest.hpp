@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/03 22:15:06 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/04 16:44:34 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ class HandleRequest
 		void checkLoctaions();
 		void checkRootLoctaion();
 		void handleChunked();
+		map<string, vector<string> > whichLocation();
 		
 		~HandleRequest();
 		string getCode(void)
@@ -68,7 +69,7 @@ class HandleRequest
 string ReadFile(string File);
 bool checkExist (const std::string& name);
 void mytrim(std::string &s, const std::string &toTrim = " \t\f\v\n\r");
-string GetIndex(string Dir);
+string GetIndex(string Dir,string root);
 string GetCT(string fileName);
 
 #endif

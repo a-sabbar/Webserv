@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/03 22:29:15 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/04 18:01:55 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,14 +118,21 @@ string HandleRequest::ReadFile(string File){
 	return ss.str();
 }
 
+map<string, vector<string> > HandleRequest::whichLocation()
+{
+	return locations["/"];
+}
+
+
 void HandleRequest::handleGet()
 {
-	// location = locations["/"];
+	map<string, vector<string> > location = whichLocation();
+	cout << root + target << endl;
 	if (ifDir(root + target) && target != "/")
 	{
-		if (locations["/"]["autoindex"].at(0) == "on")
+		if (location["autoindex"].at(0) == "on")
 		{
-			ResBody = GetIndex(root + target);
+			ResBody = GetIndex(root + target, root);
 			BodyCT = "text/html";
 		}
 		else
