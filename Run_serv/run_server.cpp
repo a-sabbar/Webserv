@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run_server.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/30 12:47:24 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/06 11:21:13 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ void clearPollList(std::vector <struct pollfd> &fds, client_d client, std::vecto
 	if(addNewFd.size())
 	{
 		std::vector <client_d>::iterator it_client = addNewFd.begin();
-		while(it_client->socketFd != client.socketFd && it_client != addNewFd.end() )
+		while(it_client->acceptFd != client.acceptFd && it_client != addNewFd.end() )
 			it_client++;
 		if(it_client->acceptFd == client.acceptFd)
 			addNewFd.erase(it_client);

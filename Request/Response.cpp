@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 11:28:20 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/04 14:29:00 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/07 15:48:28 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ string getPath(string g, string r)
     mytrim(root,"/");
     path = g.substr(root.length());
     path += "/";
-    cout << path << endl;
+    // cout << path << endl;
     return path;
 }
 

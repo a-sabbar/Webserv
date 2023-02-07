@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/19 10:42:44 by asabbar           #+#    #+#             */
-/*   Updated: 2023/02/04 16:28:33 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/07 15:59:43 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,31 +47,49 @@ int main(int ac, char **av)
         tVec.push_back("/upload"); 
         lMap["upload_store"] = tVec;       
         tVec.clear();
+        tVec.push_back("index.html"); 
+        lMap["index"] = tVec;       
+        tVec.clear();
         tVec.push_back("GET");
-        tVec.push_back("POST");
+        // tVec.push_back("POST");
         // tVec.push_back("DELETE");
         lMap["allow_methods"] = tVec;
+        tVec.clear();
 
         
         tVec.push_back("on");
         upload["autoindex"] = tVec;        
         upload["upload_enable"] = tVec;
         tVec.clear();
-        tVec.push_back("/upload"); 
+        tVec.push_back("/"); 
         upload["upload_store"] = tVec;       
+        tVec.clear();
+        tVec.push_back("ss.png"); 
+        upload["index"] = tVec;       
         tVec.clear();
         tVec.push_back("GET");
         tVec.push_back("POST");
         // tVec.push_back("DELETE");
         upload["allow_methods"] = tVec;
+        tVec.clear();
   
+        // tVec.push_back("on");
+        // Mtest["autoindex"] = tVec;        
+        // Mtest["upload_enable"] = tVec;
+        // tVec.clear();
+        // // tVec.push_back("/upload"); 
+        // // Mtest["upload_store"] = tVec;       
+        // // tVec.clear();
+        // tVec.push_back("GET");
+        // // tVec.push_back("POST");
+        // Mtest["allow_methods"] = tVec;
         
         std::vector<serv_d> test;
         serv_d s1;
 
         s1.locations["/"] = lMap;
         s1.locations["/upload"] = upload;
-        s1.locations["/upload/test"] = Mtest;
+        // s1.locations["/upload/test"] = Mtest;
 
         s1.set_host("127.0.0.1");
         s1.set_listen("80");

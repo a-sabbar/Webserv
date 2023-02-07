@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/04 18:01:55 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/07 16:23:26 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,23 @@ string HandleRequest::ReadFile(string File){
 
 map<string, vector<string> > HandleRequest::whichLocation()
 {
+	string loc = target;
+
+	while(loc != "/")
+	{
+		mytrim(loc,"/");
+		loc = "/" + loc;
+		if (locations.find(loc) != locations.end())
+			return locations[loc];
+		else
+		{
+			mytrim(loc,"/");
+			// if (loc.empty())
+			// 	return locations["/"];
+			loc = "/" + loc;
+			loc = loc.substr(0,loc.find_last_of("/") + 1);
+		}
+	}
 	return locations["/"];
 }
 
@@ -127,7 +144,7 @@ map<string, vector<string> > HandleRequest::whichLocation()
 void HandleRequest::handleGet()
 {
 	map<string, vector<string> > location = whichLocation();
-	cout << root + target << endl;
+	// cout << root + target << endl;
 	if (ifDir(root + target) && target != "/")
 	{
 		if (location["autoindex"].at(0) == "on")
@@ -279,7 +296,8 @@ void HandleRequest::treatSline(std::string startLine)
 void mytrim(std::string &s, const std::string &toTrim)
 {
 	s = s.substr(s.find_first_not_of(toTrim), s.length());
-	s = s.substr(0, s.find_last_not_of(toTrim) +1);
+	if(!s.empty())
+		s = s.substr(0, s.find_last_not_of(toTrim) + 1);
 }
 
 void HandleRequest::treatHeaders(std::string hd)
