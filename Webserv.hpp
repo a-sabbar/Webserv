@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/20 09:25:45 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/27 15:27:07 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/15 01:59:20 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,4 @@
 using namespace std;
 void    run_server(std::vector<serv_d> &servers);
 
-#endif
-
-
+#endif

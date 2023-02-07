@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/01/27 15:27:03 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/07 16:07:24 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,20 @@
 #include <fcntl.h>
 #include <algorithm>
 
+long long int	get_time(void)
+{
+	struct timeval	current_time;
+	long long int	result;
+
+	gettimeofday(&current_time, NULL);
+	result = (current_time.tv_sec * 1000) + (current_time.tv_usec / 1000);
+	return (result);
+}
 
 void myTrim(std::string &s, const std::string &toTrim = " \t\f\v\n\r")
 {
 	s = s.substr(s.find_first_not_of(toTrim), s.length());
 	s = s.substr(0, s.find_last_not_of(toTrim) +1);
-}
-
-void testCnnection (int item)
-{
-	if(item < 0)
-	{
-		perror("KO :(\nFailed to connect    : ");
-		exit(1);
-	}
-	return ;
 }
 
 struct pollfd  Accept_read(std::vector<serv_d> &servers, int i, std::vector<client_d> &addNewFd, int fd)
@@ -38,19 +37,23 @@ struct pollfd  Accept_read(std::vector<serv_d> &servers, int i, std::vector<clie
 	client_d newFd;
 
 	servers.at(i).is_accept = true;
-	// printf("fd sock:  %d\n", servers.at(i).sock);
 	temp.fd = accept(fd, (sockaddr *)&servers.at(i).address, (socklen_t *)&addrlen);
 	fcntl(temp.fd , F_SETFL, O_NONBLOCK);
-	temp.events = POLLIN | POLLOUT; 
+	temp.events = POLLIN | POLLOUT | POLLHUP; 
 	temp.revents = 0;
 
 	
 	newFd.acceptFd = temp.fd;
 	newFd.socketFd = fd;
 	newFd.lenRead = 0;
-	newFd.endSend = false;
 	newFd.isAccept = false;
 	newFd.endRead = false;
+	newFd.sendLen = 0;
+	newFd.lastRead = 0;
+	newFd.ResponsLength = 0;
+	newFd.Con = false;
+	newFd.endSend = false;
+
 	addNewFd.push_back(newFd);
 	return(temp);
 }
@@ -91,7 +94,7 @@ void clearPollList(std::vector <struct pollfd> &fds, client_d client, std::vecto
 	if(addNewFd.size())
 	{
 		std::vector <client_d>::iterator it_client = addNewFd.begin();
-		while(it_client->socketFd != client.socketFd && it_client != addNewFd.end() )
+		while(it_client->acceptFd != client.acceptFd && it_client != addNewFd.end() )
 			it_client++;
 		if(it_client->acceptFd == client.acceptFd)
 			addNewFd.erase(it_client);
@@ -166,7 +169,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 	{
 		struct pollfd temp;
 		temp.fd = it->sock;
-		temp.events = POLLIN | POLLOUT; 
+		temp.events = POLLIN | POLLOUT | POLLHUP; 
 		temp.revents = 0;
 		nfds++;
 		fds.push_back(temp);
@@ -182,7 +185,6 @@ void    run_server(std::vector<serv_d> &serv_data)
 		}
 		else if (ret > 0)
 		{
-			
 			for (size_t i = 0; i < fds.size(); i++)
 			{
 				if (fds.at(i).revents & POLLIN)
@@ -200,6 +202,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 						continue;
 					}
 					bzero(it_c->buffer, sizeof(it_c->buffer));
+					it_c->lastRead =  get_time();
 					int rec =  recv(fds.at(i).fd, it_c->buffer, sizeof(it_c->buffer), 0);
 					if(rec < 1)
 					{
@@ -215,7 +218,8 @@ void    run_server(std::vector<serv_d> &serv_data)
 					{
 						it_c->endRead = true;
 						for (it = servers.begin(); it->sock != it_c->socketFd; it++);
-						HandleRequest h(it_c->request, *it);	
+						// std::cout << it_c->request<< "\n";
+						HandleRequest h(*it_c, *it);	
 					}
 				}
 				else if (fds.at(i).revents & POLLOUT) {
@@ -228,38 +232,61 @@ void    run_server(std::vector<serv_d> &serv_data)
 					}
 					if(it_c->endRead)
 					{
-						std::string path = get_path(it_c->request);
-						myTrim(path);
-						std::string value;
-						std::ifstream  file;
-						std::ifstream  fileError;
-						file.open("Run_serv/html" + path);
-						if(!path.compare("/"))
+						int sizeRead = 6000000;
+						if((ssize_t)it_c->Respons.length() - it_c->sendLen < sizeRead)
+							sizeRead = (ssize_t)it_c->Respons.length() - it_c->sendLen;
+						it_c->sendLen += send(fds.at(i).fd, it_c->Respons.substr(it_c->sendLen).c_str(), sizeRead, 0);
+						if(it_c->sendLen >= (ssize_t)it_c->Respons.length())
 						{
-							fileError.open("Run_serv/html/home.html");
-							getline(fileError , value, '\0');
-							std::string len = std::to_string(value.length());
-							value = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
+							if(!it_c->Con)
+							{
+								close(fds.at(i).fd);
+								clearPollList(fds, *it_c, addNewFd);
+								std::cout << fds.size()<<" ============== CLOSE ==============\n";
+							}
+							else
+							{
+								it_c->lenRead = 0;
+								it_c->isAccept = false;
+								it_c->endRead = false;
+								it_c->sendLen = 0;
+								it_c->lastRead = 0;
+								it_c->ResponsLength = 0;
+								it_c->Con = false;
+								it_c->endSend = false;
+								it_c->Respons.clear();
+								it_c->request.clear();
+								std::cout << fds.size()<<" ============== KEEPALIVE ==============\n";
+							}
+							std::cout << fds.size()<<" ============== DONE ==============\n";
 						}
-						else if(!file.is_open())
-						{
-							puts("error KO :(\n");
-							fileError.open("Run_serv/html/error404.html");
-							getline(fileError , value, '\0');
-							std::string len = std::to_string(value.length());
-							value = "HTTP/1.1 404 KO\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
-						}
-						else
-						{
-							getline(file , value, '\0');
-							std::string len = std::to_string(value.length());
-							value = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + len + "\r\n\r\n" + value;
-						}
-						send(fds.at(i).fd, (char *)value.c_str(), value.length(), 0);
-						close(fds.at(i).fd);
-						clearPollList(fds, *it_c,addNewFd);
-						std::cout << fds.size()<<" ============== DONE ==============\n";
 					}
+				}
+				else if (fds.at(i).revents & POLLHUP)
+				{
+					std::cout << "TIMEOUUUUT\n" <<" ============== CLOSE ==============\n";
+					std::vector<client_d> ::iterator it_c = addNewFd.begin();
+					for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
+						it_c++;
+					}
+					if (it_c == addNewFd.end()) {
+						continue;
+					}
+					close(fds.at(i).fd);
+					clearPollList(fds, *it_c, addNewFd);
+				}
+				std::vector<client_d> ::iterator it_c = addNewFd.begin();
+				for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
+					it_c++;
+				}
+				if (it_c == addNewFd.end()) {
+					continue;
+				}
+				if(it_c->lastRead && get_time() - it_c->lastRead > 5000)
+				{
+					close(fds.at(i).fd);
+					clearPollList(fds, *it_c, addNewFd);
+					std::cout  << "  TIMEOUUUUT\n" <<" ============== CLOSE ==============\n";
 				}
 			}
 		}

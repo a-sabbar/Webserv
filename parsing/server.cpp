@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:26 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/27 15:27:34 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/01/16 22:09:17 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ serv_d::serv_d() :  sock(-1) , backlog(32)
 {
 	is_accept = false;
 }
+
+
 
 
 void serv_d::set_sock(int sock)
