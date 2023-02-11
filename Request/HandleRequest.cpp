@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/07 16:23:26 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/11 15:43:44 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,10 +110,15 @@ string HandleRequest::ReadFile(string File){
 	ifstream myfile; 
 	stringstream ss;
 	string name;
+	string ext;
+
+	name = File.substr(File.find_last_of("/") + 1);
+	ext = name.substr(name.find_first_of(".") + 1);
+	if (ext == "php")
+		return handle_cgi(File);
 	myfile.open(File);
 	ss << myfile.rdbuf();
 	myfile.close();
-	name = File.substr(File.find_last_of("/") + 1);
 	BodyCT = GetCT(name);
 	return ss.str();
 }
@@ -131,8 +136,6 @@ map<string, vector<string> > HandleRequest::whichLocation()
 		else
 		{
 			mytrim(loc,"/");
-			// if (loc.empty())
-			// 	return locations["/"];
 			loc = "/" + loc;
 			loc = loc.substr(0,loc.find_last_of("/") + 1);
 		}
@@ -144,7 +147,7 @@ map<string, vector<string> > HandleRequest::whichLocation()
 void HandleRequest::handleGet()
 {
 	map<string, vector<string> > location = whichLocation();
-	// cout << root + target << endl;
+
 	if (ifDir(root + target) && target != "/")
 	{
 		if (location["autoindex"].at(0) == "on")

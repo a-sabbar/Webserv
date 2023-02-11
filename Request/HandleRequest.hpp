@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/07 13:42:27 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/11 19:33:21 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,10 @@ class HandleRequest
 		void checkLoctaions();
 		void checkRootLoctaion();
 		void handleChunked();
+		string handle_cgi(string file);
 		map<string, vector<string> > whichLocation();
+		void setEnv(string file);
+		void Exec(string file);
 		
 		~HandleRequest();
 		string getCode(void)

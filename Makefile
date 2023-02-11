@@ -14,6 +14,7 @@ SRC =	main.cpp	\
 		Request/HandleRequest.cpp	\
 		Request/Getdata.cpp	\
 		Request/Response.cpp	\
+		Request/cgi.cpp	\
 
 OBJECTS = $(SRC:.cpp=.opp)
 
