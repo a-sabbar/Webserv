@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/11 15:43:44 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/12 17:27:41 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 HandleRequest::HandleRequest(client_d &client, serv_d &server)
 {
 	string buff = client.request;
+	// cout << buff << endl;
 	locations = server.locations;
 	root = server.root;
 	code = "200";
@@ -52,7 +53,13 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 		}
 		else if (Type == "application" || Type == "image" || Type == "text")
 		{
-			Getdata gt(body,headers["Content-Type"],1,locations["/"],root);
+			string name ,ext;
+			name = target.substr(target.find_last_of("/") + 1);
+			ext = name.substr(name.find_first_of(".") + 1);
+			if (ext == "php")
+				ResBody = handle_cgi(root + target);
+			else
+				Getdata gt(body,headers["Content-Type"],1,locations["/"],root);
 		}
 	}
 	cout << "-----------------------------" << endl;

@@ -1,4 +1,4 @@
-/* ************************************************************************** */
+// /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
@@ -6,33 +6,29 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 18:46:02 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/11 23:38:04 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/12 17:00:05 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HandleRequest.hpp"
+#include <fcntl.h>
 
 
 
 void HandleRequest::setEnv(string file)
 {
-    
     map<string, string > myEnv;
-    myEnv["SCRIPT_NAME"] = file.substr(file.find_last_of("/") + 1);
-    cout << file.substr(file.find_last_of("/") + 1) << endl;
-    myEnv["REDIRECT_STATUS"] = code;
+    myEnv["PATH_INFO"] = root;
     myEnv["REQUEST_METHOD"] = method;
-    if(!queryString.empty())
-        myEnv["QUERY_STRING"] = queryString;
-        
+    if (headers.find("Content-Length") != headers.end())
+        myEnv["CONTENT_LENGTH"] = headers["Content-Length"];
+    cout << "Content length is " << headers["Content-Length"] << endl;
+    myEnv["REDIRECT_STATUS"] = "1";
     myEnv["CONTENT_TYPE"] = headers["Content-Type"];
+    myEnv["SCRIPT_FILENAME"] = file;
+    myEnv["QUERY_STRING"] = queryString;
 
 
-
-
-
-
-    
     map<string, string>::iterator Mit;
     for (Mit = myEnv.begin(); Mit != myEnv.end(); ++Mit) {
         setenv(Mit->first.c_str() ,Mit->second.c_str(), 1);
@@ -41,22 +37,30 @@ void HandleRequest::setEnv(string file)
 
 void HandleRequest::Exec(string f)
 {
-    
     ofstream out;
-    // fstream test;
+    ofstream in;
+    int fd_in;
+
 
     out.open("/tmp/tmp.tmp");
-    FILE * h = fopen("/tmp/tmp.tmp", "w+");
-    int fd = fileno(h);    
-    // int tt = dup(1);
+    int fd = open("/tmp/tmp.tmp", O_RDWR);
     char *cmd[3];
     extern char **environ;
     
-    cmd[0] = strdup("/Users/zait-sli/Desktop/Webser/php-cgi");
+    cmd[0] = strdup("/Users/zait-sli/Desktop/Webser/Run_serv/php-cgi");
     cmd[1] = strdup(f.c_str());
     cmd[2] = NULL;
 
     int i = fork();
+    if (method == "POST" && i == 0)
+    {
+        in.open("/tmp/in.tmp");
+        in << body;
+        in.close();
+        fd_in = open("/tmp/in.tmp", O_RDONLY);
+        dup2(fd_in,0);
+        close(fd_in);
+    }
     if (i == 0)
     {
         dup2(fd,1);
@@ -66,7 +70,7 @@ void HandleRequest::Exec(string f)
     {
         waitpid(-1,NULL,0);
     }
-    // dup(tt);
+    cout << "here4" << endl;
     close(fd);
     out.close();
 }
@@ -74,7 +78,6 @@ void HandleRequest::Exec(string f)
 
 string HandleRequest::handle_cgi(string f)
 {
-    
     stringstream ret;
 
     setEnv(f);
@@ -83,8 +86,11 @@ string HandleRequest::handle_cgi(string f)
     fstream kk;
     kk.open("/tmp/tmp.tmp");
     ret << kk.rdbuf();
-    cerr << ret.str().length() << endl;
+    // cerr << ret.str().substr(ret.str().find(Spliter) + SpliterLen) << endl;
     kk.close();
-    return ret.str();
+
+    remove("/tmp/tmp.tmp");
+    remove("/tmp/in.tmp");
+    return ret.str().substr(ret.str().find(Spliter) + SpliterLen);
 }
  
