@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/11 19:33:21 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/13 21:10:52 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,10 @@
 #define Spliter "\r\n\r\n"
 #define SpliterLen 4
 using namespace std;
+
+#define PHP 5
+#define PY 6
+#define GO 7
 
 class HandleRequest
 {
@@ -38,6 +42,8 @@ class HandleRequest
 		string ResBody;
 		// serv_d serv;
 		string code;
+		bool cgi;
+		int cgiType;
 		string root;
 		string BodyCT;
 		bool upload;

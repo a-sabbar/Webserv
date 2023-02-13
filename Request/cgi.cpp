@@ -22,11 +22,13 @@ void HandleRequest::setEnv(string file)
     myEnv["REQUEST_METHOD"] = method;
     if (headers.find("Content-Length") != headers.end())
         myEnv["CONTENT_LENGTH"] = headers["Content-Length"];
-    cout << "Content length is " << headers["Content-Length"] << endl;
     myEnv["REDIRECT_STATUS"] = "1";
     myEnv["CONTENT_TYPE"] = headers["Content-Type"];
     myEnv["SCRIPT_FILENAME"] = file;
+    if (headers.find("Cookie") != headers.end())
+        myEnv["HTTP_COOKIE"] = headers["Cookie"];
     myEnv["QUERY_STRING"] = queryString;
+    cerr <<  "kkkk   " << queryString << endl;
 
 
     map<string, string>::iterator Mit;
@@ -46,8 +48,11 @@ void HandleRequest::Exec(string f)
     int fd = open("/tmp/tmp.tmp", O_RDWR);
     char *cmd[3];
     extern char **environ;
-    
-    cmd[0] = strdup("/Users/zait-sli/Desktop/Webser/Run_serv/php-cgi");
+
+    if (cgiType == PHP)
+        cmd[0] = strdup("/Users/zait-sli/Desktop/Webser/Run_serv/php-cgi");
+    if (cgiType == PY)
+        cmd[0] = strdup("/usr/local/bin/python3");
     cmd[1] = strdup(f.c_str());
     cmd[2] = NULL;
 
@@ -63,6 +68,8 @@ void HandleRequest::Exec(string f)
     }
     if (i == 0)
     {
+        setEnv(f);
+
         dup2(fd,1);
         cerr << execve(cmd[0],cmd,environ) << endl; 
     }
@@ -70,7 +77,6 @@ void HandleRequest::Exec(string f)
     {
         waitpid(-1,NULL,0);
     }
-    cout << "here4" << endl;
     close(fd);
     out.close();
 }
@@ -80,17 +86,16 @@ string HandleRequest::handle_cgi(string f)
 {
     stringstream ret;
 
-    setEnv(f);
     Exec(f);
 
+    cgi = true;
     fstream kk;
     kk.open("/tmp/tmp.tmp");
     ret << kk.rdbuf();
-    // cerr << ret.str().substr(ret.str().find(Spliter) + SpliterLen) << endl;
     kk.close();
 
     remove("/tmp/tmp.tmp");
     remove("/tmp/in.tmp");
-    return ret.str().substr(ret.str().find(Spliter) + SpliterLen);
+    return ret.str();
 }
  

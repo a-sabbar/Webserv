@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/19 10:42:44 by asabbar           #+#    #+#             */
-/*   Updated: 2023/02/07 18:42:51 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/13 18:10:35 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int main(int ac, char **av)
         tVec.clear();
 
         
-        tVec.push_back("on");
+        tVec.push_back("off");
         upload["autoindex"] = tVec;        
         upload["upload_enable"] = tVec;
         tVec.clear();
