@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 11:28:20 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/04 14:29:00 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/13 21:15:12 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ string GetCT(string fileName)
 {
     string ext = fileName.substr(fileName.find_last_of(".") + 1);
     string CT;
+
 
     if (ext == "png" || ext == "jpg" || ext == "webp" || ext == "tiff" || ext == "svg")
     {
@@ -50,7 +51,7 @@ string getPath(string g, string r)
     mytrim(root,"/");
     path = g.substr(root.length());
     path += "/";
-    cout << path << endl;
+    // cout << path << endl;
     return path;
 }
 
@@ -94,13 +95,44 @@ string GetTime()
     return T;
 }
 
+map<string, string> Handle_cgi_body(string &body)
+{
+    map<string, string> headers;
+    string hd = body.substr(0, body.find(Spliter));
+    stringstream ss(hd);
+    string line;
+    while (getline(ss, line)) {
+        size_t pos = line.find(':');
+        if (pos != string::npos) {
+            string key = line.substr(0, pos);
+            string value = line.substr(pos + 2);
+			mytrim(value);
+            headers[key] = value;
+        }
+    }
+    body = body.substr(body.find(Spliter) + SpliterLen);
+    return headers;
+}
+
 void HandleRequest::generateResponse()
 {
+    map<string, string> cgiHeaders;
+    map<string, string>::iterator it;
+    
 	string e = "\r\n";
 	Response = version + " " + code + " " + message + e;
 	Response += "Date: " + GetTime() + e;
 	Response += "Connection: " + headers["Connection"] + e;
-	Response += "Content-Type: " + BodyCT + e;
+    if(cgi && cgiType == PHP)
+    {
+        cgiHeaders = Handle_cgi_body(ResBody);
+        for(it = cgiHeaders.begin(); it != cgiHeaders.end(); it++)
+        {
+	        Response += it->first + ": " + it->second + e;
+        }
+    }
+    else
+	    Response += "Content-Type: " + BodyCT + e;
 	Response += "Content-Length: " + to_string(ResBody.length());
 	Response += Spliter + ResBody + e;
 }

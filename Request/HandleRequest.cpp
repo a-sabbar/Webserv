@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/04 18:01:55 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/13 21:26:46 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@
 HandleRequest::HandleRequest(client_d &client, serv_d &server)
 {
 	string buff = client.request;
+	// cout << buff << endl;
+	cgi = false;
 	locations = server.locations;
 	root = server.root;
 	code = "200";
@@ -52,7 +54,19 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 		}
 		else if (Type == "application" || Type == "image" || Type == "text")
 		{
-			Getdata gt(body,headers["Content-Type"],1,locations["/"],root);
+			string name ,ext;
+			name = target.substr(target.find_last_of("/") + 1);
+			ext = name.substr(name.find_first_of(".") + 1);
+			if (ext == "php" || ext == "py")
+			{
+				if (ext == "php")
+					cgiType = PHP;
+				if (ext == "py")
+					cgiType = PY;
+				ResBody = handle_cgi(root + target);
+			}
+			else
+				Getdata gt(body,headers["Content-Type"],1,locations["/"],root);
 		}
 	}
 	cout << "-----------------------------" << endl;
@@ -110,16 +124,42 @@ string HandleRequest::ReadFile(string File){
 	ifstream myfile; 
 	stringstream ss;
 	string name;
+	string ext;
+
+	name = File.substr(File.find_last_of("/") + 1);
+	ext = name.substr(name.find_first_of(".") + 1);
+	if (ext == "php" || ext == "py")
+	{
+	if (ext == "php")
+		cgiType = PHP;
+	if (ext == "py")
+		cgiType = PY;
+		return handle_cgi(File);
+	}
 	myfile.open(File);
 	ss << myfile.rdbuf();
 	myfile.close();
-	name = File.substr(File.find_last_of("/") + 1);
 	BodyCT = GetCT(name);
 	return ss.str();
 }
 
 map<string, vector<string> > HandleRequest::whichLocation()
 {
+	string loc = target;
+
+	while(loc != "/")
+	{
+		mytrim(loc,"/");
+		loc = "/" + loc;
+		if (locations.find(loc) != locations.end())
+			return locations[loc];
+		else
+		{
+			mytrim(loc,"/");
+			loc = "/" + loc;
+			loc = loc.substr(0,loc.find_last_of("/") + 1);
+		}
+	}
 	return locations["/"];
 }
 
@@ -127,7 +167,7 @@ map<string, vector<string> > HandleRequest::whichLocation()
 void HandleRequest::handleGet()
 {
 	map<string, vector<string> > location = whichLocation();
-	cout << root + target << endl;
+
 	if (ifDir(root + target) && target != "/")
 	{
 		if (location["autoindex"].at(0) == "on")
@@ -255,9 +295,6 @@ void HandleRequest::splitBody()
 	}
 	for (vector<string>::iterator it = data.begin(); it != data.end(); it++)
 	{
-		// cout << "1==========" << endl;
-		// cout <<*it  <<endl;
-		// cout << it->substr(it->find(Spliter) + SpliterLen)  <<endl;
 		Getdata gt(*it,headers["Content-Type"],0,locations["/"],root);
 	}
 }
@@ -271,7 +308,7 @@ void HandleRequest::treatSline(std::string startLine)
 	version = startLine.substr(0,startLine.find_first_of(" "));
 	if (target.find("?") != std::string::npos)
 	{
-		queryString = target.substr(target.find("?"));
+		queryString = target.substr(target.find("?") + 1);
 		target = target.substr(0,target.find("?"));
 	}
 }
@@ -279,7 +316,8 @@ void HandleRequest::treatSline(std::string startLine)
 void mytrim(std::string &s, const std::string &toTrim)
 {
 	s = s.substr(s.find_first_not_of(toTrim), s.length());
-	s = s.substr(0, s.find_last_not_of(toTrim) +1);
+	if(!s.empty())
+		s = s.substr(0, s.find_last_not_of(toTrim) + 1);
 }
 
 void HandleRequest::treatHeaders(std::string hd)

@@ -6,25 +6,24 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:26 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/16 22:09:17 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/16 18:43:57 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 
 // Constructors
-serv_d::serv_d() :  sock(-1) , backlog(32)
+serv_d::serv_d() : backlog(SOMAXCONN)
 {
-	is_accept = false;
 }
 
 
 
 
-void serv_d::set_sock(int sock)
-{
-	this->sock = sock;
-}
+// void serv_d::set_sock(int sock)
+// {
+// 	this->sock = sock;
+// }
 
 
 void serv_d::set_backlog(int backlog)
@@ -78,11 +77,10 @@ void serv_d::set_server_name(std::string server_name)
 }
 
 
-void serv_d::set_address(struct sockaddr_in address)
-{
-	this->address = address;
-}
-
+// void serv_d::set_address(struct sockaddr_in address)
+// {
+// 	this->address = address;
+// }
 
 
 

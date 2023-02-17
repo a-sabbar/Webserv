@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<form method="post" action="/get.php">
+  Name: <input type="text" name="fname">
+  <input type="submit">
+</form>
+
+Name is empty
+</body>
+</html>
