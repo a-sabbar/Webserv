@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:19 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/17 14:52:36 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/22 09:50:41 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ class parse
 		parse(const parse &copy);
 		
 		void								printData();
+		void								checkData();
 		void 								remove_comments();
 		void 								readConfig(std::string fileName);
 		void 								setsers();

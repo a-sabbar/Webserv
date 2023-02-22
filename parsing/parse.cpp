@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:23 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/17 17:02:40 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/22 10:22:14 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ void parse::checkSantax()
 	int count = 0;
 	for (std::vector<std::string>::iterator i = configFile.begin(); i != configFile.end(); i++)
 	{
+		myTrim(*i," \t\f\v\n\r");
 		if(count == 0)
 		{
 			int findd = (*i).find("server{");
@@ -104,7 +105,7 @@ void parse::checkSantax()
 				}
 			}
 		}
-		else if((int)(*i).find("location") != - 1)
+		else if((int)(*i).find("location ") != - 1)
 		{
 			if(!(split((*i), ' ').at(1)).compare("/"))
 			{
@@ -139,8 +140,22 @@ void parse::checkSantax()
 		else  {
 			if((int)(*i).find("}") == - 1 && (int)(*i).find("{") == - 1 )
 			{
-				std::cout << "---"<< *i <<"---\n";
 				std::cout << "undefine attribute\n";
+				throw ConfigNotValid();
+			}
+		}
+		std::vector<std::string>::iterator  temp = i + 1;
+		if(temp == configFile.end())
+		{
+			if(i->compare("}"))
+			{
+				std::cout << "close bracket not found\n";
+				throw ConfigNotValid();
+			}
+			std::vector<std::string>::iterator  temp1 = i  - 1;
+			if(temp1->compare("}"))
+			{
+				std::cout << "close bracket not found\n";
 				throw ConfigNotValid();
 			}
 		}
@@ -158,8 +173,12 @@ void	parse::mergeParser()
 			std::map<std::string,vector<std::string> > tempLocation;
 			if(it_location->autoindex.compare("NAN"))
 				tempLocation["autoindex"] = split(it_location->autoindex, ' ');
+			else
+				tempLocation["autoindex"] = split("off", ' ');
 			if(it_location->root.compare("NAN"))
 				tempLocation["root"] = split(it_location->root, ' ');
+			else
+				tempLocation["root"] = split("/Users/asabbar/Desktop/pushGit/Run_serv/html", ' ');
 			if(it_location->index.compare("NAN"))
 				tempLocation["index"] = split(it_location->index, ' ');
 			if(it_location->methods[0].compare("NAN"))
@@ -167,7 +186,15 @@ void	parse::mergeParser()
 			if(it_location->cgi_bin.compare("NAN"))
 				tempLocation["cgi_bin"] = split(it_location->cgi_bin, ' ');
 			if(it_location->returnn.compare("NAN"))
+			{
 				tempLocation["return"] = split(it_location->returnn, ' ');
+				std::cout <<tempLocation["return"].size() << "\n";
+				if(tempLocation["return"].size() != 2)
+				{
+					std::cout << "bad return value\n";
+					throw ConfigNotValid();
+				}
+			}
 			if(it_location->upload_store.compare("NAN"))
 				tempLocation["upload_store"] = split(it_location->upload_store, ' ');
 			it->locations[it_location->path] = tempLocation;
@@ -214,6 +241,11 @@ void	parse::checkDuplicatePort()
 			{
 				for(std::vector<std::string>::iterator port = it->listens.begin(); port != it->listens.end(); port++)
 				{
+					if(atoi(port->c_str()) == 0)
+					{
+						std::cout << "invalid Port : " << port->c_str() <<"\n";
+						throw ConfigNotValid();
+					}
 					if(std::find(i->listens.begin(),i->listens.end(), *port) != i->listens.end())
 					{
 						std::cout << "from checkDuplicatPort : Duplicate Port : " << *port <<"\n";
@@ -280,8 +312,8 @@ parse::parse(std::string file)
 	checkSantax();
 	setsers();
 	collectData();
-	checkDuplicatePort();
-	checkErrorPage();
+	checkData();
+	mergeParser();
 	// printData();
 }
 
@@ -358,22 +390,32 @@ std::vector<serv_d> &parse::getServer()
 	return serv;
 }
 
+void parse::checkData()
+{
+	checkDuplicatePort();
+	checkErrorPage();
+}
 void parse::collectData()
 {
 	for (std::vector<std::string> ::iterator i = servs.begin(); i != servs.end(); i++)
 	{
-		int l = (*i).find("location");
+		int l = (*i).find("location ");
 		class serv_d temp;
-		temp.host 			=  split(getParam(*i,"host",l),' ')[0];
-		temp.listens 		=  split(getParam(*i,"listen",l), ' ');
-		temp.root 			=  getParam(*i, "root", l);
-		temp.max_body_size	= (size_t)atoi(getParam(*i, "client_max_body_size",l).c_str());
-		temp.server_name 	= getParam(*i, "server_name",l);
-		temp.errorPage 		= getErrorPage(*i, "errorPage");
+		temp.host 			=  split(getParam(*i,"host ",l),' ')[0];
+		temp.listens 		=  split(getParam(*i,"listen ",l), ' ');
+		temp.root 			=  getParam(*i, "root ", l);
+		// if (access(temp.root.c_str(), X_OK) != 0)
+		// {
+
+		// 	std::cout << "getParam -> invalid path : "<< temp.root <<"\n";
+		// 	throw ConfigNotValid(); 
+		// }
+		temp.max_body_size	= (size_t)atoi(getParam(*i, "client_max_body_size ",l).c_str());
+		temp.server_name 	= getParam(*i, "server_name ",l);
+		temp.errorPage 		= getErrorPage(*i, "errorPage ");
 		temp.Loc 			= getLocations(*i);
 		serv.push_back(temp);
 	}
-	puts("hoooooo");
 }
 
 
@@ -387,6 +429,21 @@ void parse::myTrim(std::string &s, const std::string &toTrim = " \t\f\v\n\r")
 	s = s.substr(s.find_first_not_of(toTrim), s.length());
 	s = s.substr(0, s.find_last_not_of(toTrim) +1);
 }
+
+
+bool	checkIdDigit(const char *str)
+{
+	int i = -1;
+	while (str[++i])
+	{
+		if(!isdigit(str[i]) && str[i] == 'B' && str[i + 1] =='\0')
+			return true;
+		if(!isdigit(str[i]))
+			return false;
+	}
+	return false;
+}
+
 
 std::string parse::getParam(std::string &Fpart, std::string gg, size_t max)
 {
@@ -406,6 +463,14 @@ std::string parse::getParam(std::string &Fpart, std::string gg, size_t max)
 	myTrim(t);
 	if (!t.compare(""))
 		throw ConfigNotValid(); 
+	if(!gg.compare("client_max_body_size "))
+	{
+		if(!checkIdDigit(t.c_str()))
+		{
+			std::cout << "Error : client_max_body_size" << "\n";
+			throw ConfigNotValid(); 
+		}
+	}
 	return t;
 }
 
@@ -414,7 +479,7 @@ std::vector<std::string> parse::getErrorPage(std::string Fpart, std::string gg)
 {
 	size_t i = 0,j, l;
 	std::vector<std::string> ret;
-	l = Fpart.find("location");
+	l = Fpart.find("location ");
 	for(;;)
 	{
 		i = Fpart.find(gg, i);
@@ -476,17 +541,32 @@ std::vector<Location> parse::getLocations(std::string Fpart)
 	for (;;)
 	{
 		Location temp;
-
+		int	obli = 0;
 		
-		int fisrtLoc = Fpart.find("location", i);
+		int fisrtLoc = Fpart.find("location ", i);
 		if(fisrtLoc == -1)
 			break;
 
-		temp.path			=	getPaPath(Fpart,"location", fisrtLoc);
+		temp.path			=	getPaPath(Fpart,"location ", fisrtLoc);
+		// if (access((temp.path).c_str(), X_OK) != 0)
+		// {
+			
+		// 	std::cout << "getPaPath -> invalid path : '"<< temp.path <<"'\n";
+		// 	throw ConfigNotValid(); 
+		// }
+		mytrim(temp.path);
+		if(!(temp.path).compare("*.php") || !(temp.path).compare("*.py"))
+			obli = 1;
 		int fisrtBracket 	=	Fpart.find("{", fisrtLoc);
 		int secondBracket 	=	Fpart.find("}", fisrtBracket);
-		temp.autoindex 		=	getParamLocation(Fpart,"autoindex", fisrtBracket, secondBracket,0);
-		temp.root	 		=	getParamLocation(Fpart,"root", fisrtBracket, secondBracket, 0);
+		temp.autoindex 		=	getParamLocation(Fpart,"autoindex ", fisrtBracket, secondBracket,0);
+		temp.root	 		=	getParamLocation(Fpart,"root ", fisrtBracket, secondBracket, 0);
+		// if (access(temp.root.c_str(), X_OK) != 0)
+		// {
+
+		// 	std::cout << "getParamLocation -> invalid path : "<< temp.root <<"\n";
+		// 	throw ConfigNotValid(); 
+		// }
 		temp.index 			=	getParamLocation(Fpart,"indexPath", fisrtBracket, secondBracket, 0);
 		temp.methods 		=	split(getParamLocation(Fpart,"methods", fisrtBracket, secondBracket, 1), ' ');
 		temp.returnn 		=	getParamLocation(Fpart, "return", fisrtBracket, secondBracket, 0);

@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:30 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/16 19:14:33 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/19 14:17:40 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,9 @@
 #include <netinet/in.h>
 #include <string>
 #include <sys/time.h>
-
-     #include <sys/types.h>
-       #include <sys/socket.h>
-       #include <netdb.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 	   
 class client_d
 {
@@ -46,7 +45,7 @@ class client_d
 		unsigned long 	lenCont;
 		std::string 	Respons;
 		size_t			ResponsLength;
-		bool			Con; // 0 close, 1 keep allive
+		bool			Con;		// 0 close, 1 keep allive
 		long long int 	lastRead;
 		ssize_t 		sendLen;
 		bool 			endSend;

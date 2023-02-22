@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleRequest.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/13 21:26:46 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/20 11:19:30 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 				Getdata gt(body,headers["Content-Type"],1,locations["/"],root);
 		}
 	}
-	cout << "-----------------------------" << endl;
+	// cout << "-----------------------------" << endl;
 	generateResponse();
 	client.Respons = Response;
 	client.ResponsLength = Response.length();

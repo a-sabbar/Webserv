@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/02/17 17:09:46 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/22 12:52:58 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ struct pollfd  Accept_read(std::vector<client_d> &addNewFd, int fd)
 	struct sockaddr_storage their_addr;
     socklen_t addr_size = sizeof(their_addr);
     temp.fd = accept(fd, (struct sockaddr*)&their_addr, &addr_size);
-	puts("heree");
 	fcntl(temp.fd , F_SETFL, O_NONBLOCK);
 	temp.events = POLLIN | POLLOUT | POLLHUP; 
 	temp.revents = 0;
@@ -122,7 +121,29 @@ std::string get_path(std::string request)
 
 	return firstline.substr(firstspace, secondspace - firstspace);
 };
-
+// void	ft_replace(std::string line, std::string s1, std::string s2, std::string   &ret)
+// {
+// 	int 			i;
+// 	int 			j;
+// 	i = -1;
+// 	while(line[++i])
+// 	{
+// 		j = 0;
+// 		while(s1[j] == line[i + j])
+// 		{
+// 			if (s1[j + 1] == '\0')
+// 			{
+// 				newfile << s2;
+// 				i += s1.length();
+// 				ft_replace(&line[i], s1, s2 , newfile);
+// 				return ;
+// 			}
+// 			j++;
+// 		}
+// 		newfile << line[i];
+// 	}
+// 	return ret
+// }
 #include <algorithm>
 void    run_server(std::vector<serv_d> &serv_data)
 {
@@ -248,6 +269,8 @@ void    run_server(std::vector<serv_d> &serv_data)
 							}
 							else{
 								it_c->endRead = true;
+								// regex_replace(it_c->request, "%20", " ");
+								std::cout <<it_c->request <<"\n ============== CLOSE ==============\n";
 								for (it = serv_data.begin(); it != serv_data.begin(); it++)
 								{
 									if(std::find(it->sock.begin(), it->sock.end(), it_c->socketFd) != it->sock.end())
