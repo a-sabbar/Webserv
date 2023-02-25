@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:23 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/22 10:22:14 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/25 18:52:07 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ std::vector<std::string> split(std::string str, char delimiter)
 	{
 		if(token.compare(""))
         	tokens.push_back(token);
-		
 	}
     return tokens;
 }
@@ -178,7 +177,7 @@ void	parse::mergeParser()
 			if(it_location->root.compare("NAN"))
 				tempLocation["root"] = split(it_location->root, ' ');
 			else
-				tempLocation["root"] = split("/Users/asabbar/Desktop/pushGit/Run_serv/html", ' ');
+				tempLocation["root"] = split(it->root, ' ');
 			if(it_location->index.compare("NAN"))
 				tempLocation["index"] = split(it_location->index, ' ');
 			if(it_location->methods[0].compare("NAN"))
@@ -197,6 +196,7 @@ void	parse::mergeParser()
 			}
 			if(it_location->upload_store.compare("NAN"))
 				tempLocation["upload_store"] = split(it_location->upload_store, ' ');
+			tempLocation["name"] = split(it_location->path, ' ');
 			it->locations[it_location->path] = tempLocation;
 		}
 	}

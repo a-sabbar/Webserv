@@ -28,7 +28,6 @@ void HandleRequest::setEnv(string file)
     if (headers.find("Cookie") != headers.end())
         myEnv["HTTP_COOKIE"] = headers["Cookie"];
     myEnv["QUERY_STRING"] = queryString;
-    cerr <<  "kkkk   " << queryString << endl;
 
 
     map<string, string>::iterator Mit;
@@ -49,10 +48,11 @@ void HandleRequest::Exec(string f)
     char *cmd[3];
     extern char **environ;
 
-    if (cgiType == PHP)
-        cmd[0] = strdup("/Users/zait-sli/Desktop/Webser/Run_serv/php-cgi");
-    if (cgiType == PY)
-        cmd[0] = strdup("/usr/local/bin/python3");
+    // if (cgiType == PHP)
+        // cmd[0] = strdup("/Users/zait-sli/Desktop/WEB_main/Run_serv/php-cgi");
+    // if (cgiType == PY)
+        // cmd[0] = strdup("/usr/local/bin/python3");
+    cmd[0] = strdup(loc["cgi_bin"].at(0).c_str());
     cmd[1] = strdup(f.c_str());
     cmd[2] = NULL;
 
@@ -93,7 +93,7 @@ string HandleRequest::handle_cgi(string f)
     kk.open("/tmp/tmp.tmp");
     ret << kk.rdbuf();
     kk.close();
-
+    // cout << ret.str() << endl;
     remove("/tmp/tmp.tmp");
     remove("/tmp/in.tmp");
     return ret.str();

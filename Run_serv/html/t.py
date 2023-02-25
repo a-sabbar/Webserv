@@ -17,8 +17,8 @@ body = """
 <html>
     <body>
         <h1>Form Results</h1>
-        <p>Name: {0}</p>
-        <p>Email: {1}</p>
+        <p>name: {0}</p>
+        <p>email: {1}</p>
     </body>
 </html>
 """.format(html.escape(name), html.escape(email))

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleRequest.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/20 11:19:30 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/25 21:08:31 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,18 +22,39 @@
 HandleRequest::HandleRequest(client_d &client, serv_d &server)
 {
 	string buff = client.request;
-	// cout << buff << endl;
 	cgi = false;
+	// cout << buff << endl;
 	locations = server.locations;
+	cerr << "here" << endl;
 	root = server.root;
 	code = "200";
 	message = "OK";
+	if (buff == "timeout")
+	{
+		code = "408";
+		message = "Request Timeout";
+	}
 	std::string startLine = buff.substr(0, buff.find_first_of("\n") -1);
 	treatSline(startLine);
-	treatHeaders(buff.substr(startLine.size() + 2,buff.find(Spliter)));
-	ckeckSline();
-	checkLoctaions();
 	if (code == "200")
+	{
+		treatHeaders(buff.substr(startLine.size() + 2,buff.find(Spliter)));
+		fixTarget();
+		checkLoctaions();
+		if (loc.find("return") != loc.end())
+		{
+			// cout << "\'" << loc["return"].at(1) << "\'" << endl;
+			if (loc["return"].size() == 2)
+			{
+				method = "GET";
+				code = loc["return"].at(0);
+				target = loc["return"].at(1);
+			}
+		}
+		checkLoctaions();
+		ckeckSline();
+	}
+	if (code == "200" || code == "301")
 	{
 		body = buff.substr(buff.find(Spliter) + SpliterLen);
 		ckeckHeaders();
@@ -44,7 +65,9 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 			cout << "Encoding has been handled" << endl;
 		}
 		if (method == "GET")
+		{
 			handleGet();
+		}
 		if(method == "DELETE")
 			handleDelte();
 		if (!headers["Content-Type"].compare("multipart/form-data"))
@@ -52,7 +75,7 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 			cout << "Splited the body" << endl;
 			splitBody();
 		}
-		else if (Type == "application" || Type == "image" || Type == "text")
+		else if (Type == "application" || Type == "image" || Type == "text" )
 		{
 			string name ,ext;
 			name = target.substr(target.find_last_of("/") + 1);
@@ -69,8 +92,8 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 				Getdata gt(body,headers["Content-Type"],1,locations["/"],root);
 		}
 	}
-	// cout << "-----------------------------" << endl;
 	generateResponse();
+	// cout << Response <<  endl;
 	client.Respons = Response;
 	client.ResponsLength = Response.length();
 	if (headers["Connection"] == "keep-alive")
@@ -79,17 +102,30 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 		client.Con = 0;
 }
 
+
+void HandleRequest::fixTarget()
+{
+    size_t f = target.find("../");
+    while(f != string::npos)
+    {
+        if (f != string::npos)
+            target.replace(f, 3, "");
+        f = target.find("../");
+    }
+	// cout << target << endl;
+}
+
 int HandleRequest::ckeckSline()
 {
+
 	if (method != "GET" && method != "POST" && method != "DELETE")
 	{
 		message = "Not Implemented";
 		code = "501";
-		return 1;
+	 	return 1;
 	}
-	else if (version != "HTTP/1.1")
-	{
-			
+	if (version != "HTTP/1.1")
+	{	
 		message = "HTTP Version Not Supported";
 		code = "505";
 		return 1;
@@ -130,10 +166,10 @@ string HandleRequest::ReadFile(string File){
 	ext = name.substr(name.find_first_of(".") + 1);
 	if (ext == "php" || ext == "py")
 	{
-	if (ext == "php")
-		cgiType = PHP;
-	if (ext == "py")
-		cgiType = PY;
+		if (ext == "php")
+			cgiType = PHP;
+		if (ext == "py")
+			cgiType = PY;
 		return handle_cgi(File);
 	}
 	myfile.open(File);
@@ -146,11 +182,30 @@ string HandleRequest::ReadFile(string File){
 map<string, vector<string> > HandleRequest::whichLocation()
 {
 	string loc = target;
+	string name ,ext;
 
+
+	if (locations.find(loc) != locations.end())
+		return locations[loc];
+
+	name = target.substr(target.find_last_of("/") + 1);
+	ext = name.substr(name.find_first_of(".") + 1);
+
+	if (ext == "php" || ext == "py")
+	{
+		loc = "*." + ext;
+		if (locations.find(loc) != locations.end())
+		{
+	
+			// cout << loc << endl;
+			return locations[loc];
+		}
+	}
 	while(loc != "/")
 	{
 		mytrim(loc,"/");
 		loc = "/" + loc;
+		// cout << loc << endl;
 		if (locations.find(loc) != locations.end())
 			return locations[loc];
 		else
@@ -166,11 +221,26 @@ map<string, vector<string> > HandleRequest::whichLocation()
 
 void HandleRequest::handleGet()
 {
-	map<string, vector<string> > location = whichLocation();
-
+	if (loc.find("root") != loc.end())
+	{
+		root = loc["root"].at(0);
+	}
+	if (root != "/")
+	{
+		mytrim(root,"/");
+		root = "/" + root;
+	}
 	if (ifDir(root + target) && target != "/")
 	{
-		if (location["autoindex"].at(0) == "on")
+		if (loc.find("index") != loc.end() && checkExist(root + target + "/" +  loc["index"].at(0)))
+		{
+			ResBody = ReadFile(root + target + "/" + loc["index"].at(0));
+		}
+		else if (checkExist(root + target + "/index.html"))
+		{
+			ResBody = ReadFile(root + target + "/index.html");
+		}
+		else if (loc["autoindex"].at(0) == "on")
 		{
 			ResBody = GetIndex(root + target, root);
 			BodyCT = "text/html";
@@ -181,16 +251,16 @@ void HandleRequest::handleGet()
 			message = "Forbidden";
 			ResBody = ReadFile(root + "/403.html");
 		}
-		return ;
 	}
 	else if (target == "/")
-		ResBody = ReadFile(root + "/index.html");
+	{
+		ResBody = ReadFile(root + "/home.html");	
+	}
 	else if (!checkExist(root + target))
 	{
 		code = "404";
 		message = "Not Found";
 		ResBody = ReadFile(root + "/error404.html");
-		return;
 	}
 	else
 		ResBody = ReadFile(root + target);
@@ -229,25 +299,19 @@ int HandleRequest::ckeckHeaders()
 	return 0;
 }
 
-void HandleRequest::checkRootLoctaion()
+void HandleRequest::checkLoctaions()
 {
-	map<string, vector<string> > rootLoc = locations["/"];
+	loc = whichLocation();
 	vector<string>::iterator it;
 
-	if(rootLoc["upload_enable"].at(0) == "on")
-		upload = 1;
-	it = find(rootLoc["allow_methods"].begin(),rootLoc["allow_methods"].end(),method);
-	if (it == rootLoc["allow_methods"].end())
+	
+	it = find(loc["allow_methods"].begin(),loc["allow_methods"].end(),method);
+	if (it == loc["allow_methods"].end())
 	{
 		message = "Method Not Allowed";
 		code = "405";
 	}
-}
 
-void HandleRequest::checkLoctaions()
-{
-	if(locations.size() == 1)
-		checkRootLoctaion();
 }
 
 void HandleRequest::handleChunked()
@@ -255,7 +319,7 @@ void HandleRequest::handleChunked()
 	string tbody;
 	string hexlen;
 	size_t dec = 1;	
-	while(dec)
+	while(dec && !body.empty())
 	{
 		hexlen = body.substr(0, body.find("\r\n"));
 		body = body.substr(hexlen.length() + 2);
@@ -268,7 +332,6 @@ void HandleRequest::handleChunked()
 	}
 	body = tbody;
 }
-
 
 void HandleRequest::splitBody()
 {
@@ -299,28 +362,40 @@ void HandleRequest::splitBody()
 	}
 }
 
-void HandleRequest::treatSline(std::string startLine)
+void HandleRequest::treatSline(string startLine)
 {
+	if(startLine.size() < 14)
+	{
+		code = "400";
+		message = "Bad Request";
+		return;
+	}
 	method = startLine.substr(0,startLine.find_first_of(" "));
+	// if (method.length() <= 3 )
+	// {
+	// 	message = "Not Implemented";
+	// 	code = "501";
+	// 	return;
+	// 	}
 	startLine = startLine.substr(method.size() + 1);
 	target = startLine.substr(0,startLine.find_first_of(" "));
 	startLine = startLine.substr(target.size() + 1);
 	version = startLine.substr(0,startLine.find_first_of(" "));
-	if (target.find("?") != std::string::npos)
+	if (target.find("?") != string::npos)
 	{
 		queryString = target.substr(target.find("?") + 1);
 		target = target.substr(0,target.find("?"));
 	}
 }
 
-void mytrim(std::string &s, const std::string &toTrim)
+void mytrim(string &s, const string &toTrim)
 {
 	s = s.substr(s.find_first_not_of(toTrim), s.length());
 	if(!s.empty())
 		s = s.substr(0, s.find_last_not_of(toTrim) + 1);
 }
 
-void HandleRequest::treatHeaders(std::string hd)
+void HandleRequest::treatHeaders(string hd)
 {
 	stringstream ss(hd);
     string line;
@@ -334,6 +409,7 @@ void HandleRequest::treatHeaders(std::string hd)
         }
     }
 }
+
 HandleRequest::~HandleRequest()
 {
 	

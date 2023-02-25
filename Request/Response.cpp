@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 11:28:20 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/13 21:15:12 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/25 20:43:11 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,15 +110,47 @@ map<string, string> Handle_cgi_body(string &body)
             headers[key] = value;
         }
     }
+
     body = body.substr(body.find(Spliter) + SpliterLen);
     return headers;
 }
+
+
+string Generate_status_body(string code, string message)
+{
+    string r;
+    string m;
+
+    m = code + " " + message;
+    r = "<html><head><title>" + m + "</title></head><body><center><h1>" + m + "</h1></center></body></html>" ;
+    return r;
+}
+
+void HandleRequest::get_default()
+{
+    if (method.empty())
+        method = "GET";
+    if (version.empty())
+        version = "HTTP/1.1";
+    if (ResBody.empty() && code != "200")
+    {
+        BodyCT = "text/html";
+        ResBody = Generate_status_body(code, message);
+    }
+    else if (ResBody.empty() && code == "200")
+    {
+        ResBody = ReadFile(root + "/home.html");
+    }
+}
+
 
 void HandleRequest::generateResponse()
 {
     map<string, string> cgiHeaders;
     map<string, string>::iterator it;
     
+
+    get_default();
 	string e = "\r\n";
 	Response = version + " " + code + " " + message + e;
 	Response += "Date: " + GetTime() + e;

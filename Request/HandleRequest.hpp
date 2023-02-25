@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/13 21:10:52 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/25 15:52:18 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ using namespace std;
 #define PY 6
 #define GO 7
 
+
 class HandleRequest
 {
 	private:
@@ -38,9 +39,9 @@ class HandleRequest
 		vector<string> data;
 		string body;
 		map<string,map<string, vector<string> > > locations;
+		map<string, vector<string> > loc;
 		string Response;
 		string ResBody;
-		// serv_d serv;
 		string code;
 		bool cgi;
 		int cgiType;
@@ -67,8 +68,9 @@ class HandleRequest
 		map<string, vector<string> > whichLocation();
 		void setEnv(string file);
 		void Exec(string file);
-		
+		void fixTarget();
 		~HandleRequest();
+		void get_default();
 		string getCode(void)
 		{
 			return code;
