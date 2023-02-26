@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:26 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/16 18:43:57 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/26 12:21:23 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,6 @@ void serv_d::set_max_body_size(size_t max_body_size)
 }
 
 
-void serv_d::set_server_name(std::string server_name)
-{
-	this->server_name = server_name;
-}
 
 
 // void serv_d::set_address(struct sockaddr_in address)
