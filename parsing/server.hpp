@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:30 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/19 14:17:40 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/26 16:11:40 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 	   
+#define iteratorServer std::vector<serv_d> ::iterator
 class client_d
 {
 	public:
@@ -62,8 +63,10 @@ class serv_d
 		std::string 																	host;
 		std::string 																	listen;
 		std::vector<std::string> 														listens;
+		std::vector<serv_d> 															DuplicatePort;
+		std::vector<std::string> 														myPorts;
 		size_t 																			max_body_size;
-		std::string 																	server_name;
+		std::vector<std::string>														server_name;
 		std::vector<class Location>														Loc;
 		std::vector<std::string> 														errorPage;
 		std::map<std::string,std::string> 												pageErrorpageError;

@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:19 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/22 09:50:41 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/25 11:15:55 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ class parse
 		void								checkDuplicatePort();
 		void								checkErrorPage();
 		void								mergeParser();
+		bool								checkIsDigit(const char *str);
 		class ConfigNotValid  : public std::exception
 		{
 			public:

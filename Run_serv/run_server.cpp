@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/02/22 12:52:58 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/26 17:36:10 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,7 @@ long long int	get_time(void)
 	return (result);
 }
 
-void myTrim(std::string &s, const std::string &toTrim = " \t\f\v\n\r")
-{
-	s = s.substr(s.find_first_not_of(toTrim), s.length());
-	s = s.substr(0, s.find_last_not_of(toTrim) +1);
-}
+
 
 struct pollfd  Accept_read(std::vector<client_d> &addNewFd, int fd)
 {
@@ -77,9 +73,36 @@ int get_content_len(std::string request)
 	if(start == -1)
 		return(0);
 	else
-	 start += + (int)strlen("Content-Length: ");
-	std::string check = request.substr(start, request.find("\r\n", start));
-	return atoi(check.c_str());
+	 start += (int)strlen("Content-Length: ");
+	std::string check = request.substr(start, request.find("\r\n", start) - start);
+	int endHeader = request.find("\r\n\r\n", start);
+	if(endHeader == -1)
+		return(atoi(check.c_str()));
+	else
+		return atoi(check.c_str()) + endHeader;
+}
+
+void ft_Trim(std::string &s, const std::string &toTrim = " \t\f\v\n\r")
+{
+	if (s.find_first_not_of(toTrim) > s.length())
+	{
+		s.clear();
+		return;
+	}
+	s = s.substr(s.find_first_not_of(toTrim), s.length());
+	s = s.substr(0, s.find_last_not_of(toTrim) + 1);
+}
+
+std::string  get_host(std::string request)
+{
+	size_t start = request.find("Host: ", 0);
+	if((int)start == -1)
+		return("Not Found hhhhh");
+	else
+	 start +=  strlen("Host: ");
+	std::string host = request.substr(start, request.find("\n", start)- start);
+	ft_Trim(host);
+	return host;
 }
 
 #include <iostream>
@@ -121,29 +144,7 @@ std::string get_path(std::string request)
 
 	return firstline.substr(firstspace, secondspace - firstspace);
 };
-// void	ft_replace(std::string line, std::string s1, std::string s2, std::string   &ret)
-// {
-// 	int 			i;
-// 	int 			j;
-// 	i = -1;
-// 	while(line[++i])
-// 	{
-// 		j = 0;
-// 		while(s1[j] == line[i + j])
-// 		{
-// 			if (s1[j + 1] == '\0')
-// 			{
-// 				newfile << s2;
-// 				i += s1.length();
-// 				ft_replace(&line[i], s1, s2 , newfile);
-// 				return ;
-// 			}
-// 			j++;
-// 		}
-// 		newfile << line[i];
-// 	}
-// 	return ret
-// }
+
 #include <algorithm>
 void    run_server(std::vector<serv_d> &serv_data)
 {
@@ -251,7 +252,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 					{
 						close(fds.at(i).fd);
 						clearPollList(fds, *it_c, addNewFd);
-						std::cout <<" ============== CLOSE ==============\n";
+						std::cout <<"rec ============== CLOSE ==============\n";
 						break ;
 					}
 					it_c->request.append(it_c->buffer, rec);
@@ -268,15 +269,47 @@ void    run_server(std::vector<serv_d> &serv_data)
 								std::cout << "Bad Request\n" <<" ============== CLOSE ==============\n";
 							}
 							else{
+								
+								std::cout <<it_c->request <<"\n";
 								it_c->endRead = true;
-								// regex_replace(it_c->request, "%20", " ");
-								std::cout <<it_c->request <<"\n ============== CLOSE ==============\n";
-								for (it = serv_data.begin(); it != serv_data.begin(); it++)
+								bool useServerName = false;
+								std::string hostRequest = get_host(it_c->request);
+								for (it = serv_data.begin(); it != serv_data.end(); it++)
 								{
 									if(std::find(it->sock.begin(), it->sock.end(), it_c->socketFd) != it->sock.end())
+									{
+										for (iteratorServer it_2 = it->DuplicatePort.begin(); it_2 != it->DuplicatePort.end(); it_2++)
+										{
+											if(std::find(it_2->server_name.begin(), it_2->server_name.end(), hostRequest) != it_2->server_name.end())
+											{
+												useServerName = true;
+												std::cout <<"useServerName" <<"\n";
+												std::cout << it_2->server_name.at(0) <<"\n";
+												it = it_2;
+												break;
+											}
+										}
+										if(!useServerName)
+										{
+											std::string host = split(hostRequest, ':')[0];
+											for (iteratorServer it_2 = it->DuplicatePort.begin(); it_2 != it->DuplicatePort.end(); it_2++)
+											{
+												if(!it_2->host.compare(host))
+												{
+													std::cout <<"useIp" <<"\n";
+													std::cout << it_2->host <<"\n";
+													it = it_2;
+													break;
+												}
+											}
+											
+										}
 										break;
+									}
 								}
+								std::cout <<it_c->socketFd <<"   -  " << it->server_name.at(0) <<"\n";
 								HandleRequest h(*it_c, *it);	
+								std::cout << "hello" <<"\n";
 							}
 						}
 					}
@@ -295,13 +328,20 @@ void    run_server(std::vector<serv_d> &serv_data)
 						if((ssize_t)it_c->Respons.length() - it_c->sendLen < sizeRead)
 							sizeRead = (ssize_t)it_c->Respons.length() - it_c->sendLen;
 						it_c->sendLen += send(fds.at(i).fd, it_c->Respons.substr(it_c->sendLen).c_str(), sizeRead, 0);
+						if(it_c->sendLen < 1)
+						{
+							close(fds.at(i).fd);
+							clearPollList(fds, *it_c, addNewFd);
+							std::cout <<"send ============== CLOSE ==============\n";
+							break ;
+						}
 						if(it_c->sendLen >= (ssize_t)it_c->Respons.length())
 						{
 							if(!it_c->Con)
 							{
 								close(fds.at(i).fd);
 								clearPollList(fds, *it_c, addNewFd);
-								std::cout <<" ============== CLOSE ==============\n";
+								std::cout <<"Respons ============== CLOSE ==============\n";
 							}
 							else
 							{
@@ -322,29 +362,38 @@ void    run_server(std::vector<serv_d> &serv_data)
 				}
 				else if (fds.at(i).revents & POLLHUP)
 				{
-					std::cout << "TIMEOUUUUT\n" <<" ============== CLOSE ==============\n";
-					std::vector<client_d> ::iterator it_c = addNewFd.begin();
-					for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
-						it_c++;
-					}
-					if (it_c == addNewFd.end()) {
-						continue;
-					}
-					close(fds.at(i).fd);
-					clearPollList(fds, *it_c, addNewFd);
-				}
-				std::vector<client_d> ::iterator it_c = addNewFd.begin();
-				for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
-					it_c++;
-				}
-				if (it_c == addNewFd.end()) {
-					continue;
-				}
-				if(it_c->lastRead && get_time() - it_c->lastRead > 50000)
-				{
-					close(fds.at(i).fd);
-					clearPollList(fds, *it_c, addNewFd);
-					std::cout  << "  TIMEOUUUUT\n" <<" ============== CLOSE ==============\n";
+				// 	std::cout << "TIMEOUUUUT\n" <<" ============== CLOSE ==============\n";
+				// 	std::vector<client_d> ::iterator it_c = addNewFd.begin();
+				// 	for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
+				// 		it_c++;
+				// 	}
+				// 	if (it_c == addNewFd.end()) {
+				// 		continue;
+				// 	}
+				// 	close(fds.at(i).fd);
+				// 	clearPollList(fds, *it_c, addNewFd);
+				// }
+				// std::vector<client_d> ::iterator it_c = addNewFd.begin();
+				// for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
+				// 	it_c++;
+				// }
+				// if (it_c == addNewFd.end()) {
+				// 	continue;
+				// }
+				// if(it_c->lastRead && get_time() - it_c->lastRead > 5000)
+				// {
+				// 	close(fds.at(i).fd);
+				// 	clearPollList(fds, *it_c, addNewFd);
+				// 	it_c->request = "GET / HTTP/1.1\r\nHost: 127.0.0.1:8080\r\n\r\n";
+				// 	for (it = serv_data.begin(); it != serv_data.end(); it++)
+				// 	{
+				// 		if(std::find(it->sock.begin(), it->sock.end(), it_c->socketFd) != it->sock.end())
+				// 			break;
+				// 	}
+				// 	fds.at(i).revents = POLLOUT;
+				// 	HandleRequest h(*it_c, *it);
+					// i--;
+					// std::cout  << "  TIMEOUUUUT\n" <<" ============== CLOSE ==============\n";
 				}
 			}
 		}
