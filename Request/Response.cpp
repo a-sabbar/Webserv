@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 11:28:20 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/25 20:43:11 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/27 23:40:17 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,15 +134,21 @@ void HandleRequest::get_default()
         version = "HTTP/1.1";
     if (ResBody.empty() && code != "200")
     {
-        BodyCT = "text/html";
-        ResBody = Generate_status_body(code, message);
+        if (errorPages.find(code) != errorPages.end() && checkExist(errorPages[code]))
+        {
+            ResBody  = ReadFile(errorPages[code]);
+        }
+        else
+        {
+            BodyCT = "text/html";
+            ResBody = Generate_status_body(code, message);   
+        }
     }
     else if (ResBody.empty() && code == "200")
     {
         ResBody = ReadFile(root + "/home.html");
     }
 }
-
 
 void HandleRequest::generateResponse()
 {
@@ -154,7 +160,8 @@ void HandleRequest::generateResponse()
 	string e = "\r\n";
 	Response = version + " " + code + " " + message + e;
 	Response += "Date: " + GetTime() + e;
-	Response += "Connection: " + headers["Connection"] + e;
+    if (!headers["Connection"].empty())
+	    Response += "Connection: " + headers["Connection"] + e;
     if(cgi && cgiType == PHP)
     {
         cgiHeaders = Handle_cgi_body(ResBody);

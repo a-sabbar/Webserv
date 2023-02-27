@@ -6,11 +6,15 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:23 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/26 20:43:44 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/27 21:55:46 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parse.hpp"
+
+parse::parse()
+{
+}
 
 std::vector<std::string> split(std::string str, char delimiter)
 {
@@ -35,22 +39,23 @@ int findBracket(const char *str)
 	return (-1);
 }
 
-int check_brackets(const char *str)
+void parse::check_brackets(const char *str)
 {
-
+	int total = 0;
 	int i = 0;
 	while (str[i])
 	{
 		if (str[i] == '{')
-		{
-			if (check_brackets(&str[i + 1]) == -1)
-				exit(1);
-		}
+			total++;
 		if (str[i] == '}')
-			return (1);
+			total--;
 		i++;
 	}
-	exit(1);
+	if (total != 0)
+	{
+		std::cerr << "check_brackets" << std::endl;
+		throw ConfigNotValid();
+	}
 }
 
 int check_Semicolon(std::string line)
@@ -98,10 +103,7 @@ void parse::checkSantax()
 				std::vector<std::string>::iterator temp2 = temp1;
 				temp2--;
 				if ((*temp1).compare("}") || (*temp2).compare("}"))
-				{
-					std::cout << " -- server -- \n";
 					throw ConfigNotValid();
-				}
 			}
 		}
 		else if ((int)(*i).find("location ") != -1)
@@ -178,9 +180,7 @@ void parse::mergeParser()
 				tempLocation["autoindex"] = split("off", ' ');
 			if (it_location->root.compare("NAN"))
 				tempLocation["root"] = split(it_location->root, ' ');
-			else
-				tempLocation["root"] = split(it->root, ' ');
-			if(it_location->index.compare("NAN"))
+			if (it_location->index.compare("NAN"))
 				tempLocation["index"] = split(it_location->index, ' ');
 			if (it_location->methods[0].compare("NAN"))
 				tempLocation["allow_methods"] = it_location->methods;
@@ -200,7 +200,7 @@ void parse::mergeParser()
 							  << "\n";
 					throw ConfigNotValid();
 				}
-				if (atoi(tempLocation["return"].at(0).c_str()) < 300 || atoi(tempLocation["return"].at(0).c_str()) > 307)
+				if (atoi(tempLocation["return"].at(0).c_str()) < 300 || atoi(tempLocation["return"].at(0).c_str()) > 308)
 				{
 					std::cout << "Error : return status out of range"
 							  << "\n";
@@ -212,6 +212,12 @@ void parse::mergeParser()
 			tempLocation["name"] = split(it_location->path, ' ');
 			it->locations[it_location->path] = tempLocation;
 		}
+		// if(it->locations.find("/") == it->locations.end())
+		// {
+		// 	std::cout << "location root not found !!!" << "\n";
+		// 	throw ConfigNotValid();
+			
+		// }
 	}
 }
 
@@ -264,6 +270,7 @@ void parse::checkDuplicatePort()
 	{
 		for (iteratorServer i = serv.begin(); i != serv.end(); i++)
 		{
+			it->DuplicatePort.push_back(*it);
 			if (i != it)
 			{
 				for (std::vector<std::string>::iterator port = it->listens.begin(); port != it->listens.end(); port++)
@@ -314,16 +321,16 @@ void parse::printData()
 			std::cout << i->autoindex << "\n";
 			std::cout << i->index << "\n";
 			std::cout << i->root << "\n";
-			// std::cout<<	i->methods	 <<"\n";
+			for (std::vector<std::string>::iterator m = i->methods.begin(); m != i->methods.end(); m++)
+			{
+				std::cout<<	*m	 <<"'\n";
+			}
 			std::cout << i->returnn << "\n";
 			std::cout << i->cgi_bin << "\n";
 			std::cout << "=============== END LOCATION ===============\n";
 		}
 		std::cout << "=============== END ===============\n\n";
 	}
-}
-parse::parse()
-{
 }
 
 parse::parse(std::string file)
@@ -332,8 +339,8 @@ parse::parse(std::string file)
 	checkSantax();
 	setsers();
 	collectData();
-	checkData();
 	mergeParser();
+	checkData();
 	// printData();
 }
 
@@ -406,6 +413,7 @@ void parse::readConfig(std::string fileName)
 		rawFile.replace(rawFile.find("\t"), 1, " ");
 	while (rawFile.find("localhost") != std::string::npos)
 		rawFile.replace(rawFile.find("localhost"), 9, "127.0.0.1");
+	check_brackets(rawFile.c_str());
 }
 
 std::vector<serv_d> &parse::getServer()
@@ -415,8 +423,8 @@ std::vector<serv_d> &parse::getServer()
 
 void parse::checkData()
 {
-	checkDuplicatePort();
 	checkErrorPage();
+	checkDuplicatePort();
 }
 void parse::collectData()
 {
@@ -481,7 +489,7 @@ std::string parse::getParam(std::string &Fpart, std::string gg, size_t max)
 	i = Fpart.find(gg, 0);
 	if (i == std::string::npos || i > max)
 	{
-		if(!gg.compare("server_name "))
+		if (!gg.compare("server_name "))
 			return "webserv.com";
 		throw ConfigNotValid();
 	}
@@ -604,11 +612,4 @@ std::vector<Location> parse::getLocations(std::string Fpart)
 // Destructor
 parse::~parse()
 {
-}
-
-// Operators
-parse &parse::operator=(const parse &assign)
-{
-	(void)assign;
-	return *this;
 }

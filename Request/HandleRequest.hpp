@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/25 15:52:18 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/27 22:20:22 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,9 @@ class HandleRequest
 		vector<string> data;
 		string body;
 		map<string,map<string, vector<string> > > locations;
+		std::map<std::string,std::string> 	errorPages;
 		map<string, vector<string> > loc;
+		size_t mbs;
 		string Response;
 		string ResBody;
 		string code;
@@ -54,7 +56,8 @@ class HandleRequest
 		HandleRequest(class client_d &client, serv_d &server);
 		void generateResponse();
 		void treatSline(string);
-		int ckeckSline();
+		void ckeckSline();
+		void checkTarget();
 		int ckeckHeaders();
 		void treatHeaders(string);
 		void splitBody();
@@ -71,6 +74,8 @@ class HandleRequest
 		void fixTarget();
 		~HandleRequest();
 		void get_default();
+		void fix_target();
+		int ifRederection();
 		string getCode(void)
 		{
 			return code;

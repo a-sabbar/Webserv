@@ -4,7 +4,7 @@ GG = c++
 
 Header1 =  Webserv.hpp Request/HandleRequest.hpp Request/Getdata.hpp parsing/server.hpp parsing/parse.hpp  
 
-VERSION = -std=c++98  -Wall -Wextra -Werror # -g -fsanitize=address,undefined,integer
+VERSION = -std=c++98  -Wall -Wextra -Werror -g -fsanitize=address,undefined,integer
 
 # -g -fsanitize=address,undefined,integer
 

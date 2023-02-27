@@ -6,11 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2023/02/25 21:14:51 by zait-sli         ###   ########.fr       */
-=======
-/*   Updated: 2023/02/26 17:36:10 by asabbar          ###   ########.fr       */
->>>>>>> dffe277eb8a4b75db8c6bdf493fe1b912b967214
+/*   Updated: 2023/02/27 23:44:00 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,7 +206,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 	std::vector <client_d> addNewFd;
 	int nfds = 0;
     for (it = serv_data.begin(); it < serv_data.end(); it++)
-	{
+	{ 
 		for(std::vector<int>::iterator it_socket = it->sock.begin(); it_socket != it->sock.end(); it_socket++)
 		{
 			struct pollfd temp;
@@ -273,18 +269,10 @@ void    run_server(std::vector<serv_d> &serv_data)
 								std::cout << "Bad Request\n" <<" ============== CLOSE ==============\n";
 							}
 							else{
-								
-								std::cout <<it_c->request <<"\n";
 								it_c->endRead = true;
-<<<<<<< HEAD
-								// regex_replace(it_c->request, "%20", " ");
-								std::cout <<"\n============== CLOSE ==============\n";
-								for (it = serv_data.begin(); it != serv_data.begin(); it++)
-=======
 								bool useServerName = false;
 								std::string hostRequest = get_host(it_c->request);
 								for (it = serv_data.begin(); it != serv_data.end(); it++)
->>>>>>> dffe277eb8a4b75db8c6bdf493fe1b912b967214
 								{
 									if(std::find(it->sock.begin(), it->sock.end(), it_c->socketFd) != it->sock.end())
 									{
@@ -317,9 +305,9 @@ void    run_server(std::vector<serv_d> &serv_data)
 										break;
 									}
 								}
-								std::cout <<it_c->socketFd <<"   -  " << it->server_name.at(0) <<"\n";
+								// std::cout << it_c->request <<"= ===============\n\n";
+								std::cout << it->server_name.at(0) <<"\n";
 								HandleRequest h(*it_c, *it);	
-								std::cout << "hello" <<"\n";
 							}
 						}
 					}
@@ -372,39 +360,6 @@ void    run_server(std::vector<serv_d> &serv_data)
 				}
 				else if (fds.at(i).revents & POLLHUP)
 				{
-<<<<<<< HEAD
-					std::cout << "TIMEOUUUUT\n" <<" ============== CLOSE ==============\n";
-					std::vector<client_d> ::iterator it_c = addNewFd.begin();
-					for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
-						it_c++;
-					}
-					if (it_c == addNewFd.end()) {
-						continue;
-					}
-					close(fds.at(i).fd);
-					clearPollList(fds, *it_c, addNewFd);
-				}
-				std::vector<client_d> ::iterator it_c = addNewFd.begin();
-				for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
-					it_c++;
-				}
-				if (it_c == addNewFd.end()) {
-					continue;
-				}
-				if(it_c->lastRead && get_time() - it_c->lastRead > 5000)
-				{
-					// close(fds.at(i).fd);
-					// clearPollList(fds, *it_c, addNewFd);
-					std::cout  << "  TIMEOUUUUT\n" <<" ============== CLOSE ==============\n";
-					it_c->request = "timeout";
-					if (it_c == addNewFd.end() || it == serv_data.end())
-					{
-						cout << "problem is here here" << endl;
-					}
-					HandleRequest h(*it_c, *it);
-					fds.at(i).revents = POLLOUT;
-					i--;
-=======
 				// 	std::cout << "TIMEOUUUUT\n" <<" ============== CLOSE ==============\n";
 				// 	std::vector<client_d> ::iterator it_c = addNewFd.begin();
 				// 	for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
@@ -437,7 +392,6 @@ void    run_server(std::vector<serv_d> &serv_data)
 				// 	HandleRequest h(*it_c, *it);
 					// i--;
 					// std::cout  << "  TIMEOUUUUT\n" <<" ============== CLOSE ==============\n";
->>>>>>> dffe277eb8a4b75db8c6bdf493fe1b912b967214
 				}
 			}
 		}

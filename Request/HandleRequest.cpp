@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/25 21:08:31 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/28 00:46:36 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,15 @@
 HandleRequest::HandleRequest(client_d &client, serv_d &server)
 {
 	string buff = client.request;
+	cout << "+++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+	cout << "starts here" << endl;
+	cout << buff << endl;
+	cout << "ends here" << endl;
 	cgi = false;
-	// cout << buff << endl;
+	mbs = server.max_body_size;
 	locations = server.locations;
-	cerr << "here" << endl;
 	root = server.root;
+	errorPages = server.pageErrorpageError;
 	code = "200";
 	message = "OK";
 	if (buff == "timeout")
@@ -39,22 +43,23 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 	if (code == "200")
 	{
 		treatHeaders(buff.substr(startLine.size() + 2,buff.find(Spliter)));
-		fixTarget();
+		checkTarget();
+
 		checkLoctaions();
 		if (loc.find("return") != loc.end())
 		{
-			// cout << "\'" << loc["return"].at(1) << "\'" << endl;
 			if (loc["return"].size() == 2)
 			{
 				method = "GET";
 				code = loc["return"].at(0);
 				target = loc["return"].at(1);
 			}
+			checkLoctaions();
 		}
-		checkLoctaions();
 		ckeckSline();
+		fixTarget();
 	}
-	if (code == "200" || code == "301")
+	if (code == "200" || ifRederection())
 	{
 		body = buff.substr(buff.find(Spliter) + SpliterLen);
 		ckeckHeaders();
@@ -92,52 +97,109 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 				Getdata gt(body,headers["Content-Type"],1,locations["/"],root);
 		}
 	}
-	generateResponse();
-	// cout << Response <<  endl;
-	client.Respons = Response;
-	client.ResponsLength = Response.length();
 	if (headers["Connection"] == "keep-alive")
 		client.Con = 1;
-	else 
+	else
+	{
 		client.Con = 0;
+		headers["Connection"] = "close";
+	}
+	generateResponse();
+	client.Respons = Response;
+	client.ResponsLength = Response.length();
+	cout << Response << endl;
 }
 
+int HandleRequest::ifRederection()
+{
+	int intCode = atoi(code.c_str());
+	
+	if (intCode >= 300 && intCode <= 308  && intCode != 306)
+	{	
+		switch (intCode) 
+		{
+			case 300 :
+				message = "Multiple Choices"; break;
+			case 301 :
+				message = "Moved Permanently"; break;
+			case 302 :
+				message = "Found"; break;
+			case 303 :
+				message = "See Other"; break;
+			case 304 :
+				message = "Not Modified"; break;
+			case 305 :
+				message = "Use Proxy"; break;
+			case 307 :
+				message = "Temporary Redirect"; break;
+			case 308 :
+				message = "Permanent Redirect"; break;
+		}
+		return 1;
+	}
+	return 0;
+}
+
+void HandleRequest::checkTarget()
+{
+	size_t f;
+	string replacement;
+	string hex;
+	f = target.find("%");
+	while(f != string::npos)
+	{
+		hex = target.substr(f + 1);
+		hex = hex.substr(0 ,2);
+		replacement = strtoul(hex.c_str(), NULL, 16);
+		target = target.replace(f,3,replacement);
+		f = target.find("%");
+	}
+}
 
 void HandleRequest::fixTarget()
 {
-    size_t f = target.find("../");
-    while(f != string::npos)
-    {
-        if (f != string::npos)
-            target.replace(f, 3, "");
-        f = target.find("../");
-    }
-	// cout << target << endl;
+	string path = root + target;
+	char rootPath[PATH_MAX];
+	char childPath[PATH_MAX];
+
+	cout << "printing here" <<path << endl;
+	// if (
+		realpath(root.c_str(), rootPath) ;
+		realpath(path.c_str(), childPath);
+	// {
+	// 	cout << "olaasdasdasdasdasdasdssadsdasdasd" << endl;
+	// 	code = "404";
+	// 	message = "Not Found";
+	// }
+	root = rootPath;
+	path = childPath;
+	if (path.find(root) == 0);
+	else
+	{
+		code = "403";
+		message = "Forbidden";
+	}
+
 }
 
-int HandleRequest::ckeckSline()
+void HandleRequest::ckeckSline()
 {
 
 	if (method != "GET" && method != "POST" && method != "DELETE")
 	{
-		message = "Not Implemented";
-		code = "501";
-	 	return 1;
+		message = "Method Not Allowed";
+		code = "405";
 	}
 	if (version != "HTTP/1.1")
 	{	
 		message = "HTTP Version Not Supported";
 		code = "505";
-		return 1;
 	}
 	else if (target.at(0) != '/')
 	{
-			
 		message = "Bad Request";
 		code = "400";
-		return 1;
 	}
-	return 0;
 }
 
 
@@ -161,9 +223,12 @@ string HandleRequest::ReadFile(string File){
 	stringstream ss;
 	string name;
 	string ext;
+	size_t p;
 
 	name = File.substr(File.find_last_of("/") + 1);
-	ext = name.substr(name.find_first_of(".") + 1);
+	p = name.find(".");
+	if (p != string::npos)
+		ext = name.substr(name.find_first_of(".") + 1);
 	if (ext == "php" || ext == "py")
 	{
 		if (ext == "php")
@@ -189,23 +254,26 @@ map<string, vector<string> > HandleRequest::whichLocation()
 		return locations[loc];
 
 	name = target.substr(target.find_last_of("/") + 1);
-	ext = name.substr(name.find_first_of(".") + 1);
+	if (name.find(".") != string::npos)
+		ext = name.substr(name.find_last_of(".") + 1);
 
 	if (ext == "php" || ext == "py")
 	{
 		loc = "*." + ext;
 		if (locations.find(loc) != locations.end())
 		{
-	
-			// cout << loc << endl;
 			return locations[loc];
 		}
+		else
+		{
+			code = "501";
+			message = "Not Implemented";
+		}
 	}
-	while(loc != "/")
+	while(loc != "/" && code != "501")
 	{
 		mytrim(loc,"/");
 		loc = "/" + loc;
-		// cout << loc << endl;
 		if (locations.find(loc) != locations.end())
 			return locations[loc];
 		else
@@ -221,16 +289,13 @@ map<string, vector<string> > HandleRequest::whichLocation()
 
 void HandleRequest::handleGet()
 {
-	if (loc.find("root") != loc.end())
-	{
-		root = loc["root"].at(0);
-	}
+
 	if (root != "/")
 	{
 		mytrim(root,"/");
 		root = "/" + root;
 	}
-	if (ifDir(root + target) && target != "/")
+	if (ifDir(root + target))
 	{
 		if (loc.find("index") != loc.end() && checkExist(root + target + "/" +  loc["index"].at(0)))
 		{
@@ -252,10 +317,10 @@ void HandleRequest::handleGet()
 			ResBody = ReadFile(root + "/403.html");
 		}
 	}
-	else if (target == "/")
-	{
-		ResBody = ReadFile(root + "/home.html");	
-	}
+	// else if (target == "/")
+	// {
+	// 	ResBody = ReadFile(root + "/home.html");	
+	// }
 	else if (!checkExist(root + target))
 	{
 		code = "404";
@@ -299,17 +364,33 @@ int HandleRequest::ckeckHeaders()
 	return 0;
 }
 
+void HandleRequest::fix_target()
+{
+	string loc_name = loc["name"].at(0);
+	if (loc_name != "/")
+	{
+		if (loc_name  == target)
+			target = "/";
+		else
+			target = target.substr(loc_name.length());
+	}
+}
+
 void HandleRequest::checkLoctaions()
 {
 	loc = whichLocation();
+	fix_target();
 	vector<string>::iterator it;
-
-	
-	it = find(loc["allow_methods"].begin(),loc["allow_methods"].end(),method);
-	if (it == loc["allow_methods"].end())
+	if(loc.find("root") != loc.end())
+		root = loc["root"].at(0);
+	if (code != "501")
 	{
-		message = "Method Not Allowed";
-		code = "405";
+		it = find(loc["allow_methods"].begin(),loc["allow_methods"].end(),method);
+		if (it == loc["allow_methods"].end())
+		{
+			code = "405";
+			message = "Method Not Allowed";
+		}
 	}
 
 }
@@ -408,6 +489,13 @@ void HandleRequest::treatHeaders(string hd)
             headers[key] = value;
         }
     }
+	
+	if(atoi(headers["Content-Length"].c_str()) > (int)mbs)
+	{
+		code = "413";
+		message = "Content Too Large";
+	}
+
 }
 
 HandleRequest::~HandleRequest()

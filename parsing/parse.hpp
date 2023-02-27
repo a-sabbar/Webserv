@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:19 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/26 20:42:51 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/27 11:52:06 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ class parse
 		parse();
 		parse(std::string file);
 		parse(const parse &copy);
-		
+		void 								check_brackets(const char *str);
 		void								printData();
 		void								checkData();
 		void 								remove_comments();
@@ -80,8 +80,6 @@ class parse
 		void myTrim(std::string &s, const std::string &toTrim);
 		~parse();
 		
-		parse & operator=(const parse &assign);
-		
 };
 
-#endif
+#endif
