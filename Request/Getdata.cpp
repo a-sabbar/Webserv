@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/15 01:42:02 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/03 16:28:18 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/28 17:09:35 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,10 @@ Getdata::Getdata(string s,string ct ,bool i,map<string, vector<string> > rootLoc
 
 string Getdata::RandomName(void)
 {
-	// char filename1[L_tmpnam];
-	// mkstemp(filename1);
-	// cout << "Temporary filenames:" << endl;
-	// cout << "1. " << filename1 << endl;
-	// return(string(filename1));
-	return("hhhh");
+	srand(time(NULL));
+	size_t r = rand();
+	string ran = to_string(r);
+	return(ran);
 }
 
 void Getdata::getFileName(string str)
@@ -69,7 +67,6 @@ void Getdata::CreatFill(string data)
 		g = root + rootLoc["upload_store"].at(0) + "/" + fileName;
 	else
 		g = root + "/" + fileName;
-	// cout << g <<endl;
 	out.open(g);
 	out << data;
 	out.close();

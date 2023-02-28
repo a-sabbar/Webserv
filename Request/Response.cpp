@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 11:28:20 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/28 15:17:16 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/28 17:38:11 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,8 +110,8 @@ map<string, string> Handle_cgi_body(string &body)
             headers[key] = value;
         }
     }
-
-    body = body.substr(body.find(Spliter) + SpliterLen);
+    if (!body.empty() && body.find(Spliter) != string::npos)
+        body = body.substr(body.find(Spliter) + SpliterLen);
     return headers;
 }
 

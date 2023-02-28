@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:23 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/28 14:01:49 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/28 16:54:02 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,7 +204,9 @@ void parse::mergeParser()
 							  << "\n";
 					throw ConfigNotValid();
 				}
-				if (atoi(tempLocation["return"].at(0).c_str()) < 300 || atoi(tempLocation["return"].at(0).c_str()) > 308)
+				if (atoi(tempLocation["return"].at(0).c_str()) < 300
+					|| atoi(tempLocation["return"].at(0).c_str()) > 308
+						|| atoi(tempLocation["return"].at(0).c_str()) == 306)
 				{
 					std::cout << "Error : return status out of range"
 							  << "\n";

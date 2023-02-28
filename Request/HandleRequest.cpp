@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleRequest.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/28 14:04:07 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/28 17:56:30 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,40 +21,9 @@
 
 HandleRequest::HandleRequest(client_d &client, serv_d &server)
 {
-	string buff = client.request;
-	cgi = false;
-	mbs = server.max_body_size;
-	locations = server.locations;
-	root = server.root;
-	errorPages = server.pageErrorpageError;
-	code = "200";
-	message = "OK";
-	if (buff == "timeout")
-	{
-		code = "408";
-		message = "Request Timeout";
-	}
-	std::string startLine = buff.substr(0, buff.find_first_of("\n") -1);
-	treatSline(startLine);
-	if (code == "200")
-	{
-		treatHeaders(buff.substr(startLine.size() + 2,buff.find(Spliter)));
-		checkTarget();
+	buff = client.request;
 
-		checkLoctaions();
-		if (loc.find("return") != loc.end())
-		{
-			if (loc["return"].size() == 2)
-			{
-				method = "GET";
-				code = loc["return"].at(0);
-				target = loc["return"].at(1);
-			}
-			checkLoctaions();
-		}
-		ckeckSline();
-		fixTarget();
-	}
+	initialCheck(server); 
 	if (code == "200" || ifRederection())
 	{
 		body = buff.substr(buff.find(Spliter) + SpliterLen);
@@ -76,7 +45,7 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 			cout << "Splited the body" << endl;
 			splitBody();
 		}
-		else if (Type == "application" || Type == "image" || Type == "text" )
+		else if (Type == "application" || Type == "image" || Type == "text" || Type == "plain")
 		{
 			string name ,ext;
 			name = target.substr(target.find_last_of("/") + 1);
@@ -103,7 +72,45 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 	generateResponse();
 	client.Respons = Response;
 	client.ResponsLength = Response.length();
-	// cout << Response << endl;
+}
+
+
+void HandleRequest::initialCheck (serv_d &server)
+{
+	cgi = false;
+	mbs = server.max_body_size;
+	locations = server.locations;
+	root = server.root;
+	errorPages = server.pageErrorpageError;
+	code = "200";
+	message = "OK";
+	if (buff == "timeout")
+	{
+		code = "408";
+		message = "Request Timeout";
+	}
+	std::string startLine = buff.substr(0, buff.find_first_of("\n") -1);
+	if (code != "408")
+		treatSline(startLine);
+	if (code == "200")
+	{
+		treatHeaders(buff.substr(startLine.size() + 2,buff.find(Spliter)));
+		checkTarget();
+
+		checkLoctaions();
+		if (loc.find("return") != loc.end())
+		{
+			if (loc["return"].size() == 2)
+			{
+				method = "GET";
+				code = loc["return"].at(0);
+				target = loc["return"].at(1);
+			}
+			checkLoctaions();
+		}
+		ckeckSline();
+		fixTarget();
+	}
 }
 
 int HandleRequest::ifRederection()
@@ -159,14 +166,8 @@ void HandleRequest::fixTarget()
 	char childPath[PATH_MAX];
 
 
-	// if (
-		realpath(root.c_str(), rootPath) ;
-		realpath(path.c_str(), childPath);
-	// {
-	// 	cout << "olaasdasdasdasdasdasdssadsdasdasd" << endl;
-	// 	code = "404";
-	// 	message = "Not Found";
-	// }
+	realpath(root.c_str(), rootPath);
+	realpath(path.c_str(), childPath);
 	root = rootPath;
 	path = childPath;
 	if (path.find(root) == 0);
@@ -191,7 +192,7 @@ void HandleRequest::ckeckSline()
 		message = "HTTP Version Not Supported";
 		code = "505";
 	}
-	else if (target.at(0) != '/')
+	if (target.at(0) != '/')
 	{
 		message = "Bad Request";
 		code = "400";
@@ -313,10 +314,6 @@ void HandleRequest::handleGet()
 			ResBody = ReadFile(root + "/403.html");
 		}
 	}
-	// else if (target == "/")
-	// {
-	// 	ResBody = ReadFile(root + "/home.html");	
-	// }
 	else if (!checkExist(root + target))
 	{
 		code = "404";
@@ -362,8 +359,9 @@ int HandleRequest::ckeckHeaders()
 
 void HandleRequest::fix_target()
 {
+	cout << loc["name"].at(0) << endl;
 	string loc_name = loc["name"].at(0);
-	if (loc_name != "/")
+	if (loc_name != "/" && loc_name.at(0) != '*')
 	{
 		if (loc_name  == target)
 			target = "/";
@@ -441,23 +439,17 @@ void HandleRequest::splitBody()
 
 void HandleRequest::treatSline(string startLine)
 {
-	if(startLine.size() < 14)
-	{
+	vector<string> sline = split(startLine,' ');
+	
+	if(sline.size() != 3)
+	{ 
 		code = "400";
 		message = "Bad Request";
 		return;
 	}
-	method = startLine.substr(0,startLine.find_first_of(" "));
-	// if (method.length() <= 3 )
-	// {
-	// 	message = "Not Implemented";
-	// 	code = "501";
-	// 	return;
-	// 	}
-	startLine = startLine.substr(method.size() + 1);
-	target = startLine.substr(0,startLine.find_first_of(" "));
-	startLine = startLine.substr(target.size() + 1);
-	version = startLine.substr(0,startLine.find_first_of(" "));
+	method = sline.at(0);
+	target = sline.at(1);
+	version = sline.at(2);
 	if (target.find("?") != string::npos)
 	{
 		queryString = target.substr(target.find("?") + 1);

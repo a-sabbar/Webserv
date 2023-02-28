@@ -36,6 +36,8 @@ void HandleRequest::setEnv(string file)
     }
 }
 
+int g = 0;
+
 void HandleRequest::Exec(string f)
 {
     ofstream out;
@@ -48,10 +50,6 @@ void HandleRequest::Exec(string f)
     char *cmd[3];
     extern char **environ;
 
-    // if (cgiType == PHP)
-        // cmd[0] = strdup("/Users/zait-sli/Desktop/WEB_main/Run_serv/php-cgi");
-    // if (cgiType == PY)
-        // cmd[0] = strdup("/usr/local/bin/python3");
     cmd[0] = strdup(loc["cgi_bin"].at(0).c_str());
     cmd[1] = strdup(f.c_str());
     cmd[2] = NULL;
@@ -71,12 +69,18 @@ void HandleRequest::Exec(string f)
         setEnv(f);
 
         dup2(fd,1);
-        cerr << execve(cmd[0],cmd,environ) << endl; 
+        if (execve(cmd[0],cmd,environ) == -1)
+        {
+            g = 1;
+            exit(1);
+        } 
     }
+    else if (i == -1)
+        g = 256;
     else
-    {
-        waitpid(-1,NULL,0);
-    }
+        waitpid(-1,&g,0);
+    free(cmd[0]);
+    free(cmd[1]);
     close(fd);
     out.close();
 }
@@ -90,10 +94,17 @@ string HandleRequest::handle_cgi(string f)
 
     cgi = true;
     fstream kk;
-    kk.open("/tmp/tmp.tmp");
-    ret << kk.rdbuf();
-    kk.close();
-    // cout << ret.str() << endl;
+    if (g == 256)
+    {
+        code = "500";
+        message = "Internal Server Error";
+    }
+    else
+    {
+        kk.open("/tmp/tmp.tmp");
+        ret << kk.rdbuf();
+        kk.close();
+    }
     remove("/tmp/tmp.tmp");
     remove("/tmp/in.tmp");
     return ret.str();

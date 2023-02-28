@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run_server.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/02/28 15:17:28 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/28 17:50:32 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -325,8 +325,6 @@ void    run_server(std::vector<serv_d> &serv_data)
 						int sendSize = 6000000;
 						if((ssize_t)it_c->Respons.length() - it_c->sendLen <= sendSize)
 							sendSize = (ssize_t)it_c->Respons.length() - it_c->sendLen;
-						if(!it_c->request.compare("timeout"))
-							sendSize = 243;
 						it_c->sendLen += send(fds.at(i).fd, it_c->Respons.substr(it_c->sendLen).c_str(), sendSize, 0);
 						std::cout <<"============== send ==============\n";
 						if(it_c->sendLen < 1)
@@ -376,32 +374,32 @@ void    run_server(std::vector<serv_d> &serv_data)
 					clearPollList(fds, *it_c, addNewFd);
 					continue;
 				}
-				if(i > (size_t)nfds)
+
+				std::vector<client_d> ::iterator it_c = addNewFd.begin();
+				for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
+					it_c++;
+				}
+				if (it_c == addNewFd.end()) {
+					continue;
+				}
+				if(it_c->lastRead && get_time() - it_c->lastRead > 5000)
 				{
-					std::vector<client_d> ::iterator it_c = addNewFd.begin();
-					for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
-						it_c++;
-					}
-					if (it_c == addNewFd.end()) {
-						continue;
-					}
-					if(it_c->lastRead && get_time() - it_c->lastRead > 50000)
+					std::cout << "============ TIMEOUUUUT ============";
+					for (it = serv_data.begin(); it != serv_data.end(); it++)
 					{
-						std::cout << "============ TIMEOUUUUT ============n";
-						for (it = serv_data.begin(); it != serv_data.end(); it++)
-						{
-							if(std::find(it->sock.begin(), it->sock.end(), it_c->socketFd) != it->sock.end())
-								break;
-						}
-						if(it != serv_data.end())
-						{
-							it_c->request = "timeout";
-							fds.at(i).revents = POLLOUT;
-							it_c->endRead = true;
-							HandleRequest h(*it_c, *it);
-						}
+						if(std::find(it->sock.begin(), it->sock.end(), it_c->socketFd) != it->sock.end())
+							break;
 					}
-				} 
+					if(it != serv_data.end())
+					{
+						it_c->request = "timeout";
+						fds.at(i).revents = POLLOUT;
+						it_c->endRead = true;
+						HandleRequest h(*it_c, *it);
+						cout << "reeeeeeq" << endl;
+					}
+				}
+				
 			}
 		}
 	}
