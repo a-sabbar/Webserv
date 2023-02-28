@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:23 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/27 21:55:46 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/28 14:01:49 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,10 @@
 parse::parse()
 {
 }
-
+std::string 	&parse::getRawFile()
+{
+	return (rawFile);
+}
 std::vector<std::string> split(std::string str, char delimiter)
 {
 	std::vector<std::string> tokens;
@@ -78,9 +81,10 @@ void parse::checkSantax()
 	for (std::vector<std::string>::iterator i = configFile.begin(); i != configFile.end(); i++)
 	{
 		myTrim(*i, " \t\f\v\n\r");
-		if (!(*i).compare("") || !(*i).compare("\0"))
+		if (!i->compare("") || i->empty())
 		{
 			configFile.erase(i);
+			i--;
 			continue;
 		}
 	}
@@ -138,7 +142,7 @@ void parse::checkSantax()
 		{
 			if ((int)(*i).find("}") == -1 && (int)(*i).find("{") == -1)
 			{
-				std::cout << "undefine attribute\n";
+				std::cout << "undefine attribute\n'" << *i <<"'\n";
 				throw ConfigNotValid();
 			}
 		}
@@ -413,6 +417,8 @@ void parse::readConfig(std::string fileName)
 		rawFile.replace(rawFile.find("\t"), 1, " ");
 	while (rawFile.find("localhost") != std::string::npos)
 		rawFile.replace(rawFile.find("localhost"), 9, "127.0.0.1");
+	if(rawFile.find("server{") == std::string::npos)
+		throw ConfigNotValid();
 	check_brackets(rawFile.c_str());
 }
 

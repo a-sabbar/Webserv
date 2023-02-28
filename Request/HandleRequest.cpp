@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleRequest.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/28 00:46:36 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/28 14:04:07 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,6 @@
 HandleRequest::HandleRequest(client_d &client, serv_d &server)
 {
 	string buff = client.request;
-	cout << "+++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-	cout << "starts here" << endl;
-	cout << buff << endl;
-	cout << "ends here" << endl;
 	cgi = false;
 	mbs = server.max_body_size;
 	locations = server.locations;
@@ -107,7 +103,7 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 	generateResponse();
 	client.Respons = Response;
 	client.ResponsLength = Response.length();
-	cout << Response << endl;
+	// cout << Response << endl;
 }
 
 int HandleRequest::ifRederection()
@@ -162,7 +158,7 @@ void HandleRequest::fixTarget()
 	char rootPath[PATH_MAX];
 	char childPath[PATH_MAX];
 
-	cout << "printing here" <<path << endl;
+
 	// if (
 		realpath(root.c_str(), rootPath) ;
 		realpath(path.c_str(), childPath);

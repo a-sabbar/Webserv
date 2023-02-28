@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:19 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/27 11:52:06 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/02/28 10:46:11 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ class parse
 		void 								remove_comments();
 		void 								readConfig(std::string fileName);
 		void 								setsers();
+		std::string 						&getRawFile();
 		void 								collectData(void);
 		std::string 						getParam(std::string &Fpart, std::string gg, size_t max);
 		std::string 						getParamLocation(std::string &Fpart, std::string gg, int i, size_t max, int obli);
@@ -82,4 +83,4 @@ class parse
 		
 };
 
-#endif
+#endif

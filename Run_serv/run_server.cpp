@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run_server.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/02/27 23:44:00 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/28 15:17:28 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 				exit(1);
 			}
 			int status;
-			setsockopt(it->sock.back(), SOL_SOCKET, SO_REUSEADDR, &option, sizeof(1));
+			setsockopt(it->sock.back(), SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 			memset(&hints, 0, sizeof(hints));
 			hints.ai_family = AF_UNSPEC;     
 			hints.ai_socktype = SOCK_STREAM; 
@@ -205,6 +205,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 	std::vector <struct pollfd> fds;
 	std::vector <client_d> addNewFd;
 	int nfds = 0;
+	
     for (it = serv_data.begin(); it < serv_data.end(); it++)
 	{ 
 		for(std::vector<int>::iterator it_socket = it->sock.begin(); it_socket != it->sock.end(); it_socket++)
@@ -247,12 +248,13 @@ void    run_server(std::vector<serv_d> &serv_data)
 					}
 					bzero(it_c->buffer, sizeof(it_c->buffer));
 					it_c->lastRead =  get_time();
+					std::cout <<"============== recv ==============\n";
 					int rec =  recv(fds.at(i).fd, it_c->buffer, sizeof(it_c->buffer), 0);
 					if(rec < 1)
 					{
 						close(fds.at(i).fd);
 						clearPollList(fds, *it_c, addNewFd);
-						std::cout <<"rec ============== CLOSE ==============\n";
+						std::cout <<"============== CLOSE ==============\n";
 						break ;
 					}
 					it_c->request.append(it_c->buffer, rec);
@@ -272,6 +274,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 								it_c->endRead = true;
 								bool useServerName = false;
 								std::string hostRequest = get_host(it_c->request);
+								std::string host = split(hostRequest, ':')[0];
 								for (it = serv_data.begin(); it != serv_data.end(); it++)
 								{
 									if(std::find(it->sock.begin(), it->sock.end(), it_c->socketFd) != it->sock.end())
@@ -281,21 +284,18 @@ void    run_server(std::vector<serv_d> &serv_data)
 											if(std::find(it_2->server_name.begin(), it_2->server_name.end(), hostRequest) != it_2->server_name.end())
 											{
 												useServerName = true;
-												std::cout <<"useServerName" <<"\n";
-												std::cout << it_2->server_name.at(0) <<"\n";
 												it = it_2;
 												break;
 											}
 										}
 										if(!useServerName)
 										{
-											std::string host = split(hostRequest, ':')[0];
 											for (iteratorServer it_2 = it->DuplicatePort.begin(); it_2 != it->DuplicatePort.end(); it_2++)
 											{
+												if(!it->host.compare("0.0.0.0"))
+													break;
 												if(!it_2->host.compare(host))
 												{
-													std::cout <<"useIp" <<"\n";
-													std::cout << it_2->host <<"\n";
 													it = it_2;
 													break;
 												}
@@ -305,8 +305,8 @@ void    run_server(std::vector<serv_d> &serv_data)
 										break;
 									}
 								}
-								// std::cout << it_c->request <<"= ===============\n\n";
-								std::cout << it->server_name.at(0) <<"\n";
+								cout << it_c->request<<endl;
+								cout << it->server_name[0]<<endl;
 								HandleRequest h(*it_c, *it);	
 							}
 						}
@@ -322,24 +322,29 @@ void    run_server(std::vector<serv_d> &serv_data)
 					}
 					if(it_c->endRead)
 					{
-						int sizeRead = 6000000;
-						if((ssize_t)it_c->Respons.length() - it_c->sendLen < sizeRead)
-							sizeRead = (ssize_t)it_c->Respons.length() - it_c->sendLen;
-						it_c->sendLen += send(fds.at(i).fd, it_c->Respons.substr(it_c->sendLen).c_str(), sizeRead, 0);
+						int sendSize = 6000000;
+						if((ssize_t)it_c->Respons.length() - it_c->sendLen <= sendSize)
+							sendSize = (ssize_t)it_c->Respons.length() - it_c->sendLen;
+						if(!it_c->request.compare("timeout"))
+							sendSize = 243;
+						it_c->sendLen += send(fds.at(i).fd, it_c->Respons.substr(it_c->sendLen).c_str(), sendSize, 0);
+						std::cout <<"============== send ==============\n";
 						if(it_c->sendLen < 1)
 						{
 							close(fds.at(i).fd);
 							clearPollList(fds, *it_c, addNewFd);
-							std::cout <<"send ============== CLOSE ==============\n";
+							continue;
+							std::cout <<"============== CLOSE ==============\n";
 							break ;
 						}
 						if(it_c->sendLen >= (ssize_t)it_c->Respons.length())
 						{
-							if(!it_c->Con)
+							if(!it_c->Con || !it_c->request.compare("timeout"))
 							{
 								close(fds.at(i).fd);
 								clearPollList(fds, *it_c, addNewFd);
-								std::cout <<"Respons ============== CLOSE ==============\n";
+								std::cout <<" ============== CLOSE ==============\n";
+								continue;
 							}
 							else
 							{
@@ -358,41 +363,45 @@ void    run_server(std::vector<serv_d> &serv_data)
 						}
 					}
 				}
-				else if (fds.at(i).revents & POLLHUP)
+				else if (fds.at(i).revents & ( POLLHUP | POLLERR))
 				{
-				// 	std::cout << "TIMEOUUUUT\n" <<" ============== CLOSE ==============\n";
-				// 	std::vector<client_d> ::iterator it_c = addNewFd.begin();
-				// 	for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
-				// 		it_c++;
-				// 	}
-				// 	if (it_c == addNewFd.end()) {
-				// 		continue;
-				// 	}
-				// 	close(fds.at(i).fd);
-				// 	clearPollList(fds, *it_c, addNewFd);
-				// }
-				// std::vector<client_d> ::iterator it_c = addNewFd.begin();
-				// for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
-				// 	it_c++;
-				// }
-				// if (it_c == addNewFd.end()) {
-				// 	continue;
-				// }
-				// if(it_c->lastRead && get_time() - it_c->lastRead > 5000)
-				// {
-				// 	close(fds.at(i).fd);
-				// 	clearPollList(fds, *it_c, addNewFd);
-				// 	it_c->request = "GET / HTTP/1.1\r\nHost: 127.0.0.1:8080\r\n\r\n";
-				// 	for (it = serv_data.begin(); it != serv_data.end(); it++)
-				// 	{
-				// 		if(std::find(it->sock.begin(), it->sock.end(), it_c->socketFd) != it->sock.end())
-				// 			break;
-				// 	}
-				// 	fds.at(i).revents = POLLOUT;
-				// 	HandleRequest h(*it_c, *it);
-					// i--;
-					// std::cout  << "  TIMEOUUUUT\n" <<" ============== CLOSE ==============\n";
+					std::vector<client_d> ::iterator it_c = addNewFd.begin();
+					for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
+						it_c++;
+					}
+					if (it_c == addNewFd.end()) {
+						continue;
+					}
+					close(fds.at(i).fd);
+					clearPollList(fds, *it_c, addNewFd);
+					continue;
 				}
+				if(i > (size_t)nfds)
+				{
+					std::vector<client_d> ::iterator it_c = addNewFd.begin();
+					for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
+						it_c++;
+					}
+					if (it_c == addNewFd.end()) {
+						continue;
+					}
+					if(it_c->lastRead && get_time() - it_c->lastRead > 50000)
+					{
+						std::cout << "============ TIMEOUUUUT ============n";
+						for (it = serv_data.begin(); it != serv_data.end(); it++)
+						{
+							if(std::find(it->sock.begin(), it->sock.end(), it_c->socketFd) != it->sock.end())
+								break;
+						}
+						if(it != serv_data.end())
+						{
+							it_c->request = "timeout";
+							fds.at(i).revents = POLLOUT;
+							it_c->endRead = true;
+							HandleRequest h(*it_c, *it);
+						}
+					}
+				} 
 			}
 		}
 	}
