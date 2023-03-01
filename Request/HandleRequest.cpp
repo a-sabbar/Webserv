@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/03/01 14:33:40 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/01 16:02:50 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -313,14 +313,12 @@ void HandleRequest::handleGet()
 		{
 			code = "403";
 			message = "Forbidden";
-			ResBody = ReadFile(root + "/403.html");
 		}
 	}
 	else if (!checkExist(root + target))
 	{
 		code = "404";
 		message = "Not Found";
-		ResBody = ReadFile(root + "/error404.html");
 	}
 	else
 		ResBody = ReadFile(root + target);

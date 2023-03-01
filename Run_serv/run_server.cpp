@@ -6,13 +6,19 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/03/01 14:38:59 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/01 15:35:36 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../Webserv.hpp"
 #include <fcntl.h>
 #include <algorithm>
+#include <iostream>
+#include <cstring>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 
 long long int	get_time(void)
 {
@@ -104,13 +110,6 @@ std::string  get_host(std::string request)
 	ft_Trim(host);
 	return host;
 }
-
-#include <iostream>
-#include <cstring>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
 
 void clearPollList(std::vector <struct pollfd> &fds, client_d client, std::vector <client_d> &addNewFd)
 {
@@ -264,49 +263,38 @@ void    run_server(std::vector<serv_d> &serv_data)
 					{
 						if((int)it_c->request.find("\r\n\r\n") != -1)
 						{
-							if(!it_c->request.compare("\r\n\r\n"))
+							it_c->endRead = true;
+							bool useServerName = false;
+							std::string hostRequest = get_host(it_c->request);
+							std::string host = split(hostRequest, ':')[0];
+							for (it = serv_data.begin(); it != serv_data.end(); it++)
 							{
-								close(fds.at(i).fd);
-								clearPollList(fds, *it_c, addNewFd);
-								std::cout << "Bad Request\n" <<" ============== CLOSE ==============\n";
-							}
-							else{
-								it_c->endRead = true;
-								bool useServerName = false;
-								std::string hostRequest = get_host(it_c->request);
-								std::string host = split(hostRequest, ':')[0];
-								for (it = serv_data.begin(); it != serv_data.end(); it++)
+								if(std::find(it->sock.begin(), it->sock.end(), it_c->socketFd) != it->sock.end())
 								{
-									if(std::find(it->sock.begin(), it->sock.end(), it_c->socketFd) != it->sock.end())
+									for (iteratorServer it_2 = it->DuplicatePort.begin(); it_2 != it->DuplicatePort.end(); it_2++)
+									{
+										if(std::find(it_2->server_name.begin(), it_2->server_name.end(), hostRequest) != it_2->server_name.end())
+										{
+											useServerName = true;
+											it = it_2;
+											break;
+										}
+									}
+									if(!useServerName)
 									{
 										for (iteratorServer it_2 = it->DuplicatePort.begin(); it_2 != it->DuplicatePort.end(); it_2++)
 										{
-											if(std::find(it_2->server_name.begin(), it_2->server_name.end(), hostRequest) != it_2->server_name.end())
+											if(!it_2->host.compare(host))
 											{
-												useServerName = true;
 												it = it_2;
 												break;
 											}
 										}
-										if(!useServerName)
-										{
-											for (iteratorServer it_2 = it->DuplicatePort.begin(); it_2 != it->DuplicatePort.end(); it_2++)
-											{
-												if(!it->host.compare("0.0.0.0"))
-													break;
-												if(!it_2->host.compare(host))
-												{
-													it = it_2;
-													break;
-												}
-											}
-											
-										}
-										break;
 									}
+									break;
 								}
-								HandleRequest h(*it_c, *it);	
 							}
+							HandleRequest h(*it_c, *it);	
 						}
 					}
 				}
