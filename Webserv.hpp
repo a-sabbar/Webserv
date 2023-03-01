@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/20 09:25:45 by asabbar           #+#    #+#             */
-/*   Updated: 2023/02/26 15:18:22 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/03/01 11:26:21 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string>
+
+#define TIMEOUT 50000
+#define SENDBUFFER 6000000
+
 using namespace std;
 void    run_server(std::vector<serv_d> &servers);
 std::vector<std::string> split(std::string str, char delimiter);

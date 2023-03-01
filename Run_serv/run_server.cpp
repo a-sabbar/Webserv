@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run_server.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/03/01 00:12:40 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/01 11:26:28 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -322,11 +322,11 @@ void    run_server(std::vector<serv_d> &serv_data)
 					}
 					if(it_c->endRead)
 					{
-						int sendSize = 6000000;
+						int sendSize = SENDBUFFER;
 						if((ssize_t)it_c->Respons.length() - it_c->sendLen <= sendSize)
 							sendSize = (ssize_t)it_c->Respons.length() - it_c->sendLen;
 						if(!it_c->request.compare("timeout"))
-							sendSize = 243;
+							sendSize = it_c->Respons.length();
 						it_c->sendLen += send(fds.at(i).fd, it_c->Respons.substr(it_c->sendLen).c_str(), sendSize, 0);
 						std::cout <<"============== send ==============\n";
 						if(it_c->sendLen < 1)
@@ -376,7 +376,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 					clearPollList(fds, *it_c, addNewFd);
 					continue;
 				}
-				if(i > (size_t)nfds)
+				if(i >= (size_t)nfds)
 				{
 					std::vector<client_d> ::iterator it_c = addNewFd.begin();
 					for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
@@ -385,9 +385,9 @@ void    run_server(std::vector<serv_d> &serv_data)
 					if (it_c == addNewFd.end()) {
 						continue;
 					}
-					if(it_c->lastRead && get_time() - it_c->lastRead > 50000)
+					if(it_c->lastRead && get_time() - it_c->lastRead > TIMEOUT)
 					{
-						std::cout << "============ TIMEOUUUUT ============n";
+						std::cout << "============ TIMEOUUUUT ============\n";
 						for (it = serv_data.begin(); it != serv_data.end(); it++)
 						{
 							if(std::find(it->sock.begin(), it->sock.end(), it_c->socketFd) != it->sock.end())

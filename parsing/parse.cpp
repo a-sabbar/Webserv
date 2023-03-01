@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:23 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/28 18:22:05 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/01 11:36:46 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -302,8 +302,11 @@ void parse::checkDuplicatePort()
 						}
 						if (!it_erase->compare(*port))
 						{
-							it->DuplicatePort.push_back(*i);
-							i->listens.erase(it_erase);
+							if(!i->host.compare(it->host))
+							{
+								it->DuplicatePort.push_back(*i);
+								i->listens.erase(it_erase);		
+							}
 						}
 					}
 				}
