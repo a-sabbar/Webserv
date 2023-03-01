@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/03/01 16:02:50 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/01 23:16:08 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,27 +22,20 @@
 HandleRequest::HandleRequest(client_d &client, serv_d &server)
 {
 	buff = client.request;
-
 	initialCheck(server);
-	if (code == "200" || !ifRederection())
+	if (code == "200")
 	{
 		body = buff.substr(buff.find(Spliter) + SpliterLen);
 		ckeckHeaders();
 		string Type = headers["Content-Type"].substr(0,headers["Content-Type"].find("/"));
 		if (!headers["Transfer-Encoding"].compare("chunked"))
-		{
 			handleChunked();
-		}
 		if (method == "GET")
-		{
 			handleGet();
-		}
 		if(method == "DELETE")
 			handleDelte();
 		if (!headers["Content-Type"].compare("multipart/form-data"))
-		{
 			splitBody();
-		}
 		else if (Type == "application" || Type == "image" || Type == "text" || Type == "plain")
 		{
 			string name ,ext;
@@ -93,6 +86,7 @@ void HandleRequest::initialCheck (serv_d &server)
 	std::string startLine = buff.substr(0, buff.find_first_of("\n") -1);
 	if (code != "408")
 		treatSline(startLine);
+	ckeckSline();
 	if (code == "200")
 	{
 		treatHeaders(buff.substr(startLine.size() + 2,buff.find(Spliter)));
@@ -103,10 +97,10 @@ void HandleRequest::initialCheck (serv_d &server)
 		{
 			code = loc["return"].at(0);
 			target = loc["return"].at(1);
+			ifRederection();
 		}
 		else
 		{
-			ckeckSline();
 			fixTarget();	
 		}
 	}
@@ -181,7 +175,6 @@ void HandleRequest::fixTarget()
 
 void HandleRequest::ckeckSline()
 {
-
 	if (method != "GET" && method != "POST" && method != "DELETE")
 	{
 		message = "Method Not Allowed";
@@ -304,6 +297,10 @@ void HandleRequest::handleGet()
 		{
 			ResBody = ReadFile(root + target + "/" + loc["index"].at(0));
 		}
+		else if (checkExist(root + target + "/index.html"))
+		{
+			ResBody = ReadFile(root + target + "/index.html");
+		}
 		else if (loc["autoindex"].at(0) == "on")
 		{
 			ResBody = GetIndex(root + target, root, loc["name"].at(0));
@@ -311,8 +308,8 @@ void HandleRequest::handleGet()
 		}
 		else
 		{
-			code = "403";
-			message = "Forbidden";
+			code = "404";
+			message = "Not Found";
 		}
 	}
 	else if (!checkExist(root + target))
