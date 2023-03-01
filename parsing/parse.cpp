@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:23 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/03/01 11:36:46 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/03/01 14:38:08 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,8 +133,7 @@ void parse::checkSantax()
 		{
 			if (!check_Semicolon(*i))
 			{
-				std::cout << "from check_Semicolon"
-						  << "\n";
+				print_error("from check_Semicolon\n");
 				throw ConfigNotValid();
 			}
 		}
@@ -142,7 +141,7 @@ void parse::checkSantax()
 		{
 			if ((int)(*i).find("}") == -1 && (int)(*i).find("{") == -1)
 			{
-				std::cout << "undefine attribute\n'" << *i <<"'\n";
+				std::cerr << "undefine attribute\n'" << *i <<"'\n";
 				throw ConfigNotValid();
 			}
 		}
@@ -151,18 +150,18 @@ void parse::checkSantax()
 		{
 			if (i->compare("}"))
 			{
-				std::cout << "close bracket not found\n";
+				std::cerr << "close bracket not found\n";
 				throw ConfigNotValid();
 			}
 			std::vector<std::string>::iterator temp1 = i - 1;
 			if (temp1->compare("}"))
 			{
-				std::cout << "close bracket not found\n";
+				std::cerr << "close bracket not found\n";
 				throw ConfigNotValid();
 			}
 			if (!(--temp1)->compare("}"))
 			{
-				std::cout << "close bracket not found\n";
+				std::cerr << "close bracket not found\n";
 				throw ConfigNotValid();
 			}
 		}
@@ -195,12 +194,12 @@ void parse::mergeParser()
 				tempLocation["return"] = split(it_location->returnn, ' ');
 				if (tempLocation["return"].size() != 2)
 				{
-					std::cout << "bad return value\n";
+					std::cerr << "bad return value\n";
 					throw ConfigNotValid();
 				}
 				if (!checkIsDigit(tempLocation["return"].at(0).c_str()))
 				{
-					std::cout << tempLocation["return"].at(0).c_str() << "  Error : return status not Digit"
+					std::cerr << tempLocation["return"].at(0).c_str() << "  Error : return status not Digit"
 							  << "\n";
 					throw ConfigNotValid();
 				}
@@ -208,7 +207,7 @@ void parse::mergeParser()
 					|| atoi(tempLocation["return"].at(0).c_str()) > 308
 						|| atoi(tempLocation["return"].at(0).c_str()) == 306)
 				{
-					std::cout << "Error : return status out of range"
+					std::cerr << "Error : return status out of range"
 							  << "\n";
 					throw ConfigNotValid();
 				}
@@ -218,18 +217,18 @@ void parse::mergeParser()
 			tempLocation["name"] = split(it_location->path, ' ');
 			if(tempLocation["name"].size() != 1)
 			{
-					std::cout << "Error : bad loaction path" << "\n";
+					std::cerr << "Error : bad loaction path" << "\n";
 					throw ConfigNotValid();
 				
 			}
 			it->locations[it_location->path] = tempLocation;
 		}
-		// if(it->locations.find("/") == it->locations.end())
-		// {
-		// 	std::cout << "location root not found !!!" << "\n";
-		// 	throw ConfigNotValid();
+		if(it->locations.find("/") == it->locations.end())
+		{
+			std::cerr << "location root not found !!!" << "\n";
+			throw ConfigNotValid();
 			
-		// }
+		}
 	}
 }
 
@@ -243,7 +242,7 @@ void parse::checkErrorPage()
 			std::vector<std::string> spliit = split(*pageError, ' ');
 			if (spliit.size() != 2)
 			{
-				std::cout << "from checkErrorPage : pageError not valid :(\n";
+				std::cerr << "from checkErrorPage : pageError not valid :(\n";
 				throw ConfigNotValid();
 			}
 			else
@@ -271,7 +270,7 @@ void parse::checkDuplicatePort()
 				{
 					if (find(port + 1, i->listens.end(), *port) != i->listens.end())
 					{
-						std::cout << "from checkDuplicatPort : Duplicate Port : " << *port << "\n";
+						std::cerr << "from checkDuplicatPort : Duplicate Port : " << *port << "\n";
 						throw ConfigNotValid();
 					}
 				}
@@ -289,7 +288,7 @@ void parse::checkDuplicatePort()
 				{
 					if (atoi(port->c_str()) == 0)
 					{
-						std::cout << "invalid Port : " << port->c_str() << "\n";
+						std::cerr << "invalid Port : " << port->c_str() << "\n";
 						throw ConfigNotValid();
 					}
 					if (std::find(i->listens.begin(), i->listens.end(), *port) != i->listens.end())
@@ -315,39 +314,6 @@ void parse::checkDuplicatePort()
 	}
 }
 
-void parse::printData()
-{
-	std::vector<class serv_d>::iterator it = serv.begin();
-	for (; it != serv.end(); it++)
-	{
-		std::cout << "=============== SERVER ===============\n";
-		std::cout << it->host << "\n";
-		for (std::vector<std::string>::iterator i = it->listens.begin(); i != it->listens.end(); i++)
-			std::cout << *i << " ";
-		std::cout << "\n";
-		std::cout << it->max_body_size << "\n";
-		std::cout << it->root << "\n";
-		for (std::vector<std::string>::iterator i = it->errorPage.begin(); i != it->errorPage.end(); i++)
-			std::cout << *i << "\n";
-		for (std::vector<class Location>::iterator i = it->Loc.begin(); i != it->Loc.end(); i++)
-		{
-			std::cout << "=============== LOCATION ===============\n";
-			std::cout << i->path << "\n";
-			std::cout << i->autoindex << "\n";
-			std::cout << i->index << "\n";
-			std::cout << i->root << "\n";
-			for (std::vector<std::string>::iterator m = i->methods.begin(); m != i->methods.end(); m++)
-			{
-				std::cout<<	*m	 <<"'\n";
-			}
-			std::cout << i->returnn << "\n";
-			std::cout << i->cgi_bin << "\n";
-			std::cout << "=============== END LOCATION ===============\n";
-		}
-		std::cout << "=============== END ===============\n\n";
-	}
-}
-
 parse::parse(std::string file)
 {
 	readConfig(file);
@@ -356,7 +322,6 @@ parse::parse(std::string file)
 	collectData();
 	mergeParser();
 	checkData();
-	// printData();
 }
 
 parse::parse(const parse &copy)
@@ -450,7 +415,7 @@ void parse::collectData()
 		int max = (*i).find("location ");
 		if ((size_t)max == std::string::npos)
 		{
-			std::cout << "location not found !!"
+			std::cerr << "location not found !!"
 					  << "\n";
 			throw ConfigNotValid();
 		}
@@ -514,7 +479,7 @@ std::string parse::getParam(std::string &Fpart, std::string gg, size_t max)
 	size_t temp = Fpart.find(gg, i);
 	if ((int)temp != -1 && temp < max)
 	{
-		std::cout << "duplicata : " << gg << " !!\n";
+		std::cerr << "duplicata : " << gg << " !!\n";
 		throw ConfigNotValid();
 	}
 	j = Fpart.find_first_of(";\n", i);
@@ -526,7 +491,7 @@ std::string parse::getParam(std::string &Fpart, std::string gg, size_t max)
 	{
 		if (!checkIsDigit_bit(t.c_str()))
 		{
-			std::cout << "Error : client_max_body_size"
+			std::cerr << "Error : client_max_body_size"
 					  << "\n";
 			throw ConfigNotValid();
 		}
@@ -582,7 +547,7 @@ std::string parse::getParamLocation(std::string &Fpart, std::string gg, int min,
 	i += gg.length();
 	if ((int)Fpart.find(gg, i) != -1 && Fpart.find(gg, i) < max)
 	{
-		std::cout << "Duplicate : " << gg << "\n";
+		std::cerr << "Duplicate : " << gg << "\n";
 		throw ConfigNotValid();
 	}
 	j = Fpart.find_first_of(";\n", i);
@@ -626,7 +591,6 @@ std::vector<Location> parse::getLocations(std::string Fpart)
 	return ret;
 }
 
-// Destructor
 parse::~parse()
 {
 }

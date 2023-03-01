@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run_server.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/03/01 11:26:28 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/03/01 14:38:59 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 				perror("From getaddrinfo error: ");
 				exit (1);
 			}
-			std::cout<<it->sock.back() << "  ---  "<< it_listen->c_str()<< "\n";
+			std::cerr<<it->sock.back() << "  ---  "<< it_listen->c_str()<< "\n";
 			if (bind(it->sock.back(), result->ai_addr, result->ai_addrlen) == -1) {
 				perror("From Bind error ");
 				exit (1);
@@ -224,7 +224,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 		int ret = poll(&fds[0], fds.size(), -1);
 		if (ret == -1)
 		{
-			std::cout << "error :" << std::endl;
+			std::cerr << "error : POLLL" << std::endl;
 			break;
 		}
 		else if (ret > 0)
@@ -305,8 +305,6 @@ void    run_server(std::vector<serv_d> &serv_data)
 										break;
 									}
 								}
-								cout << it_c->request<<endl;
-								cout << it->server_name[0]<<endl;
 								HandleRequest h(*it_c, *it);	
 							}
 						}
@@ -387,7 +385,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 					}
 					if(it_c->lastRead && get_time() - it_c->lastRead > TIMEOUT)
 					{
-						std::cout << "============ TIMEOUUUUT ============\n";
+						std::cerr << "============ TIMEOUUUUT ============\n";
 						for (it = serv_data.begin(); it != serv_data.end(); it++)
 						{
 							if(std::find(it->sock.begin(), it->sock.end(), it_c->socketFd) != it->sock.end())

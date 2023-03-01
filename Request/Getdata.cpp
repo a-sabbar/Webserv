@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/15 01:42:02 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/28 17:09:35 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/01 14:33:56 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #include <fstream>
 #include <cstdio> 
 
-// Constructors
 Getdata::Getdata(string s,string ct ,bool i,map<string, vector<string> > rootLoc,string root)
 {
 	this->rootLoc = rootLoc;
@@ -35,12 +34,8 @@ Getdata::Getdata(string s,string ct ,bool i,map<string, vector<string> > rootLoc
 	}
 	else
 	{
-		// RandomName();
 		fileName = RandomName();
-		// if (ct == "application/pdf")
-		// 	fileName += ".pdf";
-		// else if(ct == "image/png")
-			fileName += "." + ct.substr(ct.find("/") + 1);
+		fileName += "." + ct.substr(ct.find("/") + 1);
 		CreatFill(s);
 	}
 }
@@ -63,8 +58,10 @@ void Getdata::CreatFill(string data)
 {
 	ofstream out;
 	string g;
-	if (rootLoc["upload_store"].size() == 1)
+	if (rootLoc["upload_store"].size() == 1 )
+	{
 		g = root + rootLoc["upload_store"].at(0) + "/" + fileName;
+	}
 	else
 		g = root + "/" + fileName;
 	out.open(g);

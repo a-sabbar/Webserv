@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/28 23:25:27 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/01 14:06:48 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ class HandleRequest
 		string ResBody;
 		string code;
 		bool cgi;
+		bool reder;
 		int cgiType;
 		string root;
 		string BodyCT;

@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/19 10:42:44 by asabbar           #+#    #+#             */
-/*   Updated: 2023/02/27 21:40:21 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/01 14:36:51 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int main(int ac, char **av)
 {
     if (ac != 2)
     {
-        std::cout << "Ghayarha" << std::endl;
+      print_error("Ghayarha\n");
         return 1;
     }
     std::string arg = std::string(av[1]);

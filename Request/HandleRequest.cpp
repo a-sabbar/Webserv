@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/03/01 01:55:08 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/01 14:33:40 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 {
 	buff = client.request;
 
-	initialCheck(server); 
-	if (code == "200" || ifRederection())
+	initialCheck(server);
+	if (code == "200" || !ifRederection())
 	{
 		body = buff.substr(buff.find(Spliter) + SpliterLen);
 		ckeckHeaders();
@@ -32,7 +32,6 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 		if (!headers["Transfer-Encoding"].compare("chunked"))
 		{
 			handleChunked();
-			cout << "Encoding has been handled" << endl;
 		}
 		if (method == "GET")
 		{
@@ -42,7 +41,6 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 			handleDelte();
 		if (!headers["Content-Type"].compare("multipart/form-data"))
 		{
-			cout << "Splited the body" << endl;
 			splitBody();
 		}
 		else if (Type == "application" || Type == "image" || Type == "text" || Type == "plain")
@@ -59,7 +57,9 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 				ResBody = handle_cgi(root + target);
 			}
 			else
-				Getdata gt(body,headers["Content-Type"],1,locations["/"],root);
+			{
+				Getdata gt(body,headers["Content-Type"],1,loc,root);
+			}
 		}
 	}
 	if (headers["Connection"] == "keep-alive")
@@ -78,6 +78,7 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 void HandleRequest::initialCheck (serv_d &server)
 {
 	cgi = false;
+	reder = false;
 	mbs = server.max_body_size;
 	locations = server.locations;
 	root = server.root;
@@ -92,24 +93,22 @@ void HandleRequest::initialCheck (serv_d &server)
 	std::string startLine = buff.substr(0, buff.find_first_of("\n") -1);
 	if (code != "408")
 		treatSline(startLine);
-	if (code == "200" || ifRederection())
+	if (code == "200")
 	{
 		treatHeaders(buff.substr(startLine.size() + 2,buff.find(Spliter)));
 		checkTarget();
 
 		checkLoctaions();
-		if (loc.find("return") != loc.end())
+		if (loc.find("return") != loc.end() && loc["return"].size() == 2)
 		{
-			if (loc["return"].size() == 2)
-			{
-				method = "GET";
-				code = loc["return"].at(0);
-				target = loc["return"].at(1);
-			}
-			checkLoctaions();
+			code = loc["return"].at(0);
+			target = loc["return"].at(1);
 		}
-		ckeckSline();
-		fixTarget();
+		else
+		{
+			ckeckSline();
+			fixTarget();	
+		}
 	}
 }
 
@@ -119,6 +118,7 @@ int HandleRequest::ifRederection()
 	
 	if (intCode >= 300 && intCode <= 308  && intCode != 306)
 	{	
+		reder = true;
 		switch (intCode) 
 		{
 			case 300 :
@@ -149,7 +149,6 @@ void HandleRequest::checkTarget()
 	string replacement;
 	string hex;
 	f = target.find("%");
-	cout << target << endl;
 	while(f != string::npos)
 	{
 		hex = target.substr(f + 1);
@@ -158,7 +157,6 @@ void HandleRequest::checkTarget()
 		target = target.replace(f,3,replacement);
 		f = target.find("%");
 	}
-	cout << target << endl;
 }
 
 void HandleRequest::fixTarget()
@@ -330,24 +328,32 @@ void HandleRequest::handleGet()
 
 void HandleRequest::handleDelte()
 {
-	cout << root + target << endl;
-	// if (!checkExist(root + target) || target == "/")
 	if (ifDir(root + target))
 	{
-		cout << "here" << endl;
 		code = "403";
 		message = "Forbidden";
 		return;
 	}
 	else if (!checkExist(root + target))
 	{
-		cout << "here" << endl;
 		code = "404";
 		message = "Not Found";
 		return;
 	}
 	string file = root + target;
-	remove(file.c_str());
+	
+	int r = remove(file.c_str());
+	if (r == -1)
+	{
+        code = "500";
+        message = "Internal Server Error";
+	}
+	else
+	{
+		ResBody = "<h1><center>Deleted successfully</center></h1>";
+		BodyCT = "text/html";
+	}
+	
 }
 
 int HandleRequest::ckeckHeaders()
@@ -389,7 +395,6 @@ void HandleRequest::fix_target()
 		loc_check = target.substr(0,target.find_last_of("/"));
 		while(loc_check != "/")
 		{
-			cout << "loc has become " <<loc_check << endl;
 			mytrim(loc_check,"/");
 			loc_check = "/" + loc_check;
 			if (locations.find(loc_check) != locations.end())
@@ -471,7 +476,8 @@ void HandleRequest::splitBody()
 	}
 	for (vector<string>::iterator it = data.begin(); it != data.end(); it++)
 	{
-		Getdata gt(*it,headers["Content-Type"],0,locations["/"],root);
+		Getdata gt(*it,headers["Content-Type"],0,loc,root);
+			
 	}
 }
 
@@ -481,7 +487,6 @@ void HandleRequest::treatSline(string startLine)
 	
 	if(sline.size() != 3)
 	{ 
-	cout << "good news" << endl ;
 		code = "400";
 		message = "Bad Request";
 		return;
@@ -525,8 +530,3 @@ HandleRequest::~HandleRequest()
 {
 	
 }
-
-
-///check request line => methode $$ uri.at(0) = '/' && http version || query string ?key=value&&key=value
-///check headrs host !bad request &&  if(post)=> content lenght && content type && content lenght transfer encoded chencd
-///parse body : multipart/form-data; && 

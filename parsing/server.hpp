@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:30 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/26 16:11:40 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/03/01 14:34:25 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,16 +73,6 @@ class serv_d
 		std::map<std::string, std::map<std::string, std::vector<std::string> > >		locations;
 	
 		serv_d();
-		// void set_sock(int sock);
-		void set_backlog(int backlog);
-		void set_listening(int listening);
-		void set_connection(int connection);
-		void set_root(std::string root);
-		void set_host(std::string host);
-		void set_listen(std::string listen);
-		void set_max_body_size(size_t max_body_size);
-		void set_server_name(std::string server_name);
-		// void set_address(struct sockaddr_in address);
 		~serv_d();
 		serv_d &operator=(const serv_d &assign);
 };

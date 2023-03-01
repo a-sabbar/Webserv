@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/15 01:42:06 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/01/25 13:03:37 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/01 14:33:58 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ class Getdata
 		string root;
 		map<string, vector<string> > rootLoc;
 	public:
-		// Constructors
 		Getdata(string s,string ct,bool,map<string, vector<string> > rootLoc,string root);
 		void getFileName(string Fpart);
 		string getRandomName();

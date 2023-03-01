@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 11:28:20 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/28 23:26:14 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/01 14:33:28 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ string getPath(string g, string r)
     mytrim(root,"/");
     path = g.substr(root.length());
     path += "/";
-    // cout << path << endl;
     return path;
 }
 
@@ -69,7 +68,6 @@ string GetIndex(string Dir,string root,string locName)
     {
         path = locName + path;
     }
-    cout << "path is" << path << endl;  
     index = "<html> \n";
     index += "<head><title>Index of " + path + "</title></head>\n";
     index += "<body> \n";
@@ -133,7 +131,7 @@ void HandleRequest::get_default()
 {
     if (method.empty())
         method = "GET";
-    if (version.empty())
+    if (version.empty() || version.compare("HTTP/1.1"))
         version = "HTTP/1.1";
     if (ResBody.empty() && code != "200")
     {
@@ -163,6 +161,8 @@ void HandleRequest::generateResponse()
 	string e = "\r\n";
 	Response = version + " " + code + " " + message + e;
 	Response += "Date: " + GetTime() + e;
+    if (reder == true)
+	    Response += "Location: " + target + e;
     if (!headers["Connection"].empty())
 	    Response += "Connection: " + headers["Connection"] + e;
     if(cgi && cgiType == PHP)
