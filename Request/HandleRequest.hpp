@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:55 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/28 17:14:15 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/28 23:25:27 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ class HandleRequest
 string ReadFile(string File);
 bool checkExist (const std::string& name);
 void mytrim(std::string &s, const std::string &toTrim = " \t\f\v\n\r");
-string GetIndex(string Dir,string root);
+string GetIndex(string Dir,string root, string locName);
 string GetCT(string fileName);
 
 #endif

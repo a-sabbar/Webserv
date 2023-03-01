@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:23 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/28 16:54:02 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/28 18:22:05 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,6 +216,12 @@ void parse::mergeParser()
 			if (it_location->upload_store.compare("NAN"))
 				tempLocation["upload_store"] = split(it_location->upload_store, ' ');
 			tempLocation["name"] = split(it_location->path, ' ');
+			if(tempLocation["name"].size() != 1)
+			{
+					std::cout << "Error : bad loaction path" << "\n";
+					throw ConfigNotValid();
+				
+			}
 			it->locations[it_location->path] = tempLocation;
 		}
 		// if(it->locations.find("/") == it->locations.end())

@@ -20,7 +20,7 @@ void HandleRequest::setEnv(string file)
     map<string, string > myEnv;
     myEnv["PATH_INFO"] = root;
     myEnv["REQUEST_METHOD"] = method;
-    if (headers.find("Content-Length") != headers.end())
+    if (headers.find("Content-Length") != headers.end() && method == "POST")
         myEnv["CONTENT_LENGTH"] = headers["Content-Length"];
     myEnv["REDIRECT_STATUS"] = "1";
     myEnv["CONTENT_TYPE"] = headers["Content-Type"];

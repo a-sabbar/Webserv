@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/28 17:56:30 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/01 01:55:08 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void HandleRequest::initialCheck (serv_d &server)
 	std::string startLine = buff.substr(0, buff.find_first_of("\n") -1);
 	if (code != "408")
 		treatSline(startLine);
-	if (code == "200")
+	if (code == "200" || ifRederection())
 	{
 		treatHeaders(buff.substr(startLine.size() + 2,buff.find(Spliter)));
 		checkTarget();
@@ -149,6 +149,7 @@ void HandleRequest::checkTarget()
 	string replacement;
 	string hex;
 	f = target.find("%");
+	cout << target << endl;
 	while(f != string::npos)
 	{
 		hex = target.substr(f + 1);
@@ -157,6 +158,7 @@ void HandleRequest::checkTarget()
 		target = target.replace(f,3,replacement);
 		f = target.find("%");
 	}
+	cout << target << endl;
 }
 
 void HandleRequest::fixTarget()
@@ -165,7 +167,7 @@ void HandleRequest::fixTarget()
 	char rootPath[PATH_MAX];
 	char childPath[PATH_MAX];
 
-
+	
 	realpath(root.c_str(), rootPath);
 	realpath(path.c_str(), childPath);
 	root = rootPath;
@@ -196,6 +198,11 @@ void HandleRequest::ckeckSline()
 	{
 		message = "Bad Request";
 		code = "400";
+	}
+	if (target.find("?") != string::npos)
+	{
+		queryString = target.substr(target.find("?") + 1);
+		target = target.substr(0,target.find("?"));
 	}
 }
 
@@ -259,6 +266,7 @@ map<string, vector<string> > HandleRequest::whichLocation()
 		loc = "*." + ext;
 		if (locations.find(loc) != locations.end())
 		{
+			
 			return locations[loc];
 		}
 		else
@@ -286,7 +294,7 @@ map<string, vector<string> > HandleRequest::whichLocation()
 
 void HandleRequest::handleGet()
 {
-
+	
 	if (root != "/")
 	{
 		mytrim(root,"/");
@@ -298,13 +306,9 @@ void HandleRequest::handleGet()
 		{
 			ResBody = ReadFile(root + target + "/" + loc["index"].at(0));
 		}
-		else if (checkExist(root + target + "/index.html"))
-		{
-			ResBody = ReadFile(root + target + "/index.html");
-		}
 		else if (loc["autoindex"].at(0) == "on")
 		{
-			ResBody = GetIndex(root + target, root);
+			ResBody = GetIndex(root + target, root, loc["name"].at(0));
 			BodyCT = "text/html";
 		}
 		else
@@ -326,10 +330,20 @@ void HandleRequest::handleGet()
 
 void HandleRequest::handleDelte()
 {
-	if (!checkExist(root + target) || target == "/")
+	cout << root + target << endl;
+	// if (!checkExist(root + target) || target == "/")
+	if (ifDir(root + target))
 	{
-		code = "408";
-		message = "Bad Request";
+		cout << "here" << endl;
+		code = "403";
+		message = "Forbidden";
+		return;
+	}
+	else if (!checkExist(root + target))
+	{
+		cout << "here" << endl;
+		code = "404";
+		message = "Not Found";
 		return;
 	}
 	string file = root + target;
@@ -359,14 +373,38 @@ int HandleRequest::ckeckHeaders()
 
 void HandleRequest::fix_target()
 {
-	cout << loc["name"].at(0) << endl;
 	string loc_name = loc["name"].at(0);
+	string loc_check;
 	if (loc_name != "/" && loc_name.at(0) != '*')
 	{
 		if (loc_name  == target)
 			target = "/";
 		else
 			target = target.substr(loc_name.length());
+	}
+	else if (loc_name.at(0) == '*')
+	{
+		if (target.find_last_of("/") == 0)
+			return ;
+		loc_check = target.substr(0,target.find_last_of("/"));
+		while(loc_check != "/")
+		{
+			cout << "loc has become " <<loc_check << endl;
+			mytrim(loc_check,"/");
+			loc_check = "/" + loc_check;
+			if (locations.find(loc_check) != locations.end())
+				break ;
+			else
+			{
+				mytrim(loc_check,"/");
+				loc_check = "/" + loc_check;
+				loc_check = loc_check.substr(0,loc_check.find_last_of("/") + 1);
+			}
+		}
+		if (loc_check != "/")
+		{
+			target = target.substr(loc_check.length());
+		}
 	}
 }
 
@@ -443,6 +481,7 @@ void HandleRequest::treatSline(string startLine)
 	
 	if(sline.size() != 3)
 	{ 
+	cout << "good news" << endl ;
 		code = "400";
 		message = "Bad Request";
 		return;
@@ -450,11 +489,7 @@ void HandleRequest::treatSline(string startLine)
 	method = sline.at(0);
 	target = sline.at(1);
 	version = sline.at(2);
-	if (target.find("?") != string::npos)
-	{
-		queryString = target.substr(target.find("?") + 1);
-		target = target.substr(0,target.find("?"));
-	}
+
 }
 
 void mytrim(string &s, const string &toTrim)

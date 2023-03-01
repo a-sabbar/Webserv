@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 11:28:20 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/28 17:38:11 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/02/28 23:26:14 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ string getPath(string g, string r)
     return path;
 }
 
-string GetIndex(string Dir,string root)
+string GetIndex(string Dir,string root,string locName)
 {
     string index;
     string name;
@@ -64,19 +64,22 @@ string GetIndex(string Dir,string root)
     DIR *dp;
     struct dirent *ep;     
     dp = opendir (Dir.c_str());
-    
     path = getPath(Dir,root);
-    
+    if (locName != "/")
+    {
+        path = locName + path;
+    }
+    cout << "path is" << path << endl;  
     index = "<html> \n";
     index += "<head><title>Index of " + path + "</title></head>\n";
     index += "<body> \n";
-    index += "<h1>Index of " + path + "</h1><hr><pre><a href=\""+ path +"../\">../</a> \n";
+    index += "<h1>Index of "  + path + "</h1><hr><pre><a href=\""+ path +"../\">../</a> \n";
 
     while ((ep = readdir (dp)) != NULL)
     { 
         name = string(ep->d_name);
         if (name != "." && name != "..")
-            index += "<a href=\"" + path + name + "\">" + name + "</a>\n";
+            index += "<a href=\""  + path + name + "\">" + name + "</a>\n";
     }
     (void) closedir (dp);
 
