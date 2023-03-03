@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 11:28:20 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/03/01 14:33:28 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/03 00:33:44 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,10 +79,9 @@ string GetIndex(string Dir,string root,string locName)
         if (name != "." && name != "..")
             index += "<a href=\""  + path + name + "\">" + name + "</a>\n";
     }
-    (void) closedir (dp);
+    closedir (dp);
 
-    index += "</pre><hr></body>\n";
-    index += "<html>";
+    index += "</pre><hr></body>\n<html>";
     return index;
 }
 
@@ -162,7 +161,10 @@ void HandleRequest::generateResponse()
 	Response = version + " " + code + " " + message + e;
 	Response += "Date: " + GetTime() + e;
     if (reder == true)
+    {
 	    Response += "Location: " + target + e;
+
+    }
     if (!headers["Connection"].empty())
 	    Response += "Connection: " + headers["Connection"] + e;
     if(cgi && cgiType == PHP)
@@ -175,6 +177,7 @@ void HandleRequest::generateResponse()
     }
     else
 	    Response += "Content-Type: " + BodyCT + e;
+    Response += "Cache-Control: no-cache" + e;
 	Response += "Content-Length: " + to_string(ResBody.length());
 	Response += Spliter + ResBody + e;
 }

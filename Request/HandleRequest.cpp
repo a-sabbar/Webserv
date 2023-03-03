@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/03/01 23:16:08 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/03 00:29:02 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,9 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 		if (!headers["Transfer-Encoding"].compare("chunked"))
 			handleChunked();
 		if (method == "GET")
+		{
 			handleGet();
+		}
 		if(method == "DELETE")
 			handleDelte();
 		if (!headers["Content-Type"].compare("multipart/form-data"))
@@ -63,7 +65,9 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 		headers["Connection"] = "close";
 	}
 	generateResponse();
+	cout << "+++++++++++++++++++++++++++++++" << endl;
 	client.Respons = Response;
+	cout << Response << endl;
 	client.ResponsLength = Response.length();
 }
 
@@ -100,9 +104,7 @@ void HandleRequest::initialCheck (serv_d &server)
 			ifRederection();
 		}
 		else
-		{
 			fixTarget();	
-		}
 	}
 }
 
@@ -169,31 +171,37 @@ void HandleRequest::fixTarget()
 	{
 		code = "403";
 		message = "Forbidden";
-	}
-
+	} 
 }
 
 void HandleRequest::ckeckSline()
 {
-	if (method != "GET" && method != "POST" && method != "DELETE")
+	if (code == "200")
 	{
-		message = "Method Not Allowed";
-		code = "405";
-	}
-	if (version != "HTTP/1.1")
-	{	
-		message = "HTTP Version Not Supported";
-		code = "505";
-	}
-	if (target.at(0) != '/')
-	{
-		message = "Bad Request";
-		code = "400";
-	}
-	if (target.find("?") != string::npos)
-	{
-		queryString = target.substr(target.find("?") + 1);
-		target = target.substr(0,target.find("?"));
+		if (method != "GET" && method != "POST" && method != "DELETE")
+		{
+			message = "Method Not Allowed";
+			code = "405";
+			return ;
+		}
+		if (version != "HTTP/1.1")
+		{	
+			message = "HTTP Version Not Supported";
+			code = "505";
+			return ;
+		}
+		if (target.at(0) != '/')
+		{
+			message = "Bad Request";
+			code = "400";
+			return ;
+		}
+		if (target.find("?") != string::npos)
+		{
+			queryString = target.substr(target.find("?") + 1);
+			target = target.substr(0,target.find("?"));
+			return ;
+		}
 	}
 }
 
@@ -203,6 +211,7 @@ bool ifDir(const std::string& name)
 	DIR *pdir = opendir(name.c_str());
 
 	if(pdir){
+		closedir(pdir);
 		return 1;
 	}
 	return 0;
@@ -293,6 +302,7 @@ void HandleRequest::handleGet()
 	}
 	if (ifDir(root + target))
 	{
+		
 		if (loc.find("index") != loc.end() && checkExist(root + target + "/" +  loc["index"].at(0)))
 		{
 			ResBody = ReadFile(root + target + "/" + loc["index"].at(0));
@@ -479,7 +489,7 @@ void HandleRequest::splitBody()
 void HandleRequest::treatSline(string startLine)
 {
 	vector<string> sline = split(startLine,' ');
-	
+
 	if(sline.size() != 3)
 	{ 
 		code = "400";

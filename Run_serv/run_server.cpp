@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/03/01 22:59:21 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/02 20:40:25 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,8 +235,12 @@ void    run_server(std::vector<serv_d> &serv_data)
 					if (find(serverSocket.begin(), serverSocket.end(), fds.at(i).fd) != serverSocket.end()) 
 					{
 						std::cout << "============== ACCEPT ==============\n";
-
 						fds.push_back(Accept_read(addNewFd, fds.at(i).fd));
+						if(fds.back().fd == -1)
+						{
+							fds.pop_back();
+							addNewFd.pop_back();
+						}
 					}
 					std::vector<client_d> ::iterator it_c = addNewFd.begin();
 					for ( ;it_c != addNewFd.end() && it_c->acceptFd != fds.at(i).fd; ){
@@ -294,6 +298,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 									break;
 								}
 							}
+							cout << it->server_name.at(0) << "\n"<<it_c->request <<"\n";
 							HandleRequest h(*it_c, *it);	
 						}
 					}

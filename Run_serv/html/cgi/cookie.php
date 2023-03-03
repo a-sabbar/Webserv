@@ -1,5 +1,5 @@
 <?php
-$cookie_value = "asdasdasdasd";
+$cookie_value = "asdassssdasd";
 $cookie_name = "USER";
 setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/");
 ?>

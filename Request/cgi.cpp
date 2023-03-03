@@ -18,6 +18,7 @@
 void HandleRequest::setEnv(string file)
 {
     map<string, string > myEnv;
+
     myEnv["PATH_INFO"] = root;
     myEnv["REQUEST_METHOD"] = method;
     if (headers.find("Content-Length") != headers.end() && method == "POST")
@@ -26,7 +27,14 @@ void HandleRequest::setEnv(string file)
     myEnv["CONTENT_TYPE"] = headers["Content-Type"];
     myEnv["SCRIPT_FILENAME"] = file;
     if (headers.find("Cookie") != headers.end())
-        myEnv["HTTP_COOKIE"] = headers["Cookie"];
+    {
+        if (headers["Cookie"].find("PHPSESSID") != string::npos)
+        {
+            myEnv["SESSION"] = headers["Cookie"].substr(headers["Cookie"].find("PHPSESSID"));
+        }
+        else
+            myEnv["HTTP_COOKIE"] = headers["Cookie"];
+    }
     myEnv["QUERY_STRING"] = queryString;
 
 
@@ -107,6 +115,7 @@ string HandleRequest::handle_cgi(string f)
     }
     remove("/tmp/tmp.tmp");
     remove("/tmp/in.tmp");
+    cout <<ret.str() << endl;
     return ret.str();
 }
  
