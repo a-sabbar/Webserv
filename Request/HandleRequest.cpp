@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/03/03 00:29:02 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/04 04:46:31 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,6 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 		headers["Connection"] = "close";
 	}
 	generateResponse();
-	cout << "+++++++++++++++++++++++++++++++" << endl;
 	client.Respons = Response;
 	cout << Response << endl;
 	client.ResponsLength = Response.length();

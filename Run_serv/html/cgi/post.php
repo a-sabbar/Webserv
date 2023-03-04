@@ -1,12 +1,17 @@
+<!DOCTYPE html>
+<html>
 <body>
-<!-- <link rel="stylesheet" href="./style.css"> -->
-    <div class="container">
-        <a href="/"><h1>WebServ</h1></a>
-        <p>CGI Get Test</p>
 <?php
-echo "Hello " . $_GET["lgname"] . " " . $_GET["fgname"] . " !";
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $name = $_POST['fname'];
+    if (empty($name)) {
+        echo "Name is empty";
+    } else {
+        echo $name;
+    }
+}
 ?>
-</div>
-</section>
+
 </body>
 </html>

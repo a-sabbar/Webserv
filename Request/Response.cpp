@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 11:28:20 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/03/03 00:33:44 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/03 23:05:08 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,10 +144,6 @@ void HandleRequest::get_default()
             ResBody = Generate_status_body(code, message);   
         }
     }
-    else if (ResBody.empty() && code == "200")
-    {
-        ResBody = ReadFile(root + "/home.html");
-    }
 }
 
 void HandleRequest::generateResponse()
@@ -180,4 +176,4 @@ void HandleRequest::generateResponse()
     Response += "Cache-Control: no-cache" + e;
 	Response += "Content-Length: " + to_string(ResBody.length());
 	Response += Spliter + ResBody + e;
-}
+} 

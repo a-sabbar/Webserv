@@ -1,10 +1,9 @@
+<html>
+<h1><pre><a href="/">Webserv Home</a> </pre></h1>
 <body>
-<!-- <link rel="stylesheet" href="./style.css"> -->
-    <div class="container">
-        <a href="/"><h1>WebServ</h1></a>
         <p>CGI Get Test</p>
 <?php
-echo "Hello " . $_GET["lgname"] . " " . $_GET["fgname"] . " !";
+echo "Hello " . $_GET["fname"];
 ?>
 </div>
 </section>

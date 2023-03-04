@@ -28,12 +28,7 @@ void HandleRequest::setEnv(string file)
     myEnv["SCRIPT_FILENAME"] = file;
     if (headers.find("Cookie") != headers.end())
     {
-        if (headers["Cookie"].find("PHPSESSID") != string::npos)
-        {
-            myEnv["SESSION"] = headers["Cookie"].substr(headers["Cookie"].find("PHPSESSID"));
-        }
-        else
-            myEnv["HTTP_COOKIE"] = headers["Cookie"];
+        myEnv["HTTP_COOKIE"] = headers["Cookie"];
     }
     myEnv["QUERY_STRING"] = queryString;
 
