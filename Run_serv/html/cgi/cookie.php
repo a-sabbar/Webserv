@@ -5,8 +5,9 @@ setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/");
 ?>
 
 <html>
-
-<body>
+    
+    <body>
+    <h1><center><a href="/">Webserv Home</a> </center></h1>
     <?php
     if (!isset($_COOKIE[$cookie_name])) {
         echo "<h3>Cookie = '" . $cookie_name . "' is not set!</h3>";

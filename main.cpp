@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/19 10:42:44 by asabbar           #+#    #+#             */
-/*   Updated: 2023/03/04 11:21:33 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/03/04 18:31:00 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,13 @@ int main(int ac, char **av)
     std::string arg;
     if (ac > 2)
     {
-      print_error("Ghayarha\n");
+        print_error("Ghayarha\n");
         return 1;
     }
     else if(ac == 2)
         arg = std::string(av[1]);
     else
-        arg = "/Users/asabbar/Desktop/WEB_main/config_file/webser.conf";
+        arg = "config_file/default.conf";
     try
     {
         parse Parsing(arg);

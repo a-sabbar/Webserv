@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleRequest.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/03/04 11:40:30 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/03/04 18:58:39 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 		}
 		if(method == "DELETE")
 			handleDelte();
-		if (!headers["Content-Type"].compare("multipart/form-data"))
+		else if (!headers["Content-Type"].compare("multipart/form-data"))
 			splitBody();
 		else if (Type == "application" || Type == "image" || Type == "text" || Type == "plain")
 		{
@@ -54,6 +54,9 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 			else
 			{
 				Getdata gt(body,headers["Content-Type"],1,loc,root);
+				ResBody = "<h1><center><a href=\"" + string("/") + "\">Webserv Home</a> </center></h1>";
+				ResBody += "<h1><center>Uploaded successfully</center></h1>";
+				BodyCT = "text/html";
 			}
 		}
 	}
@@ -66,7 +69,6 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 	}
 	generateResponse();
 	client.Respons = Response;
-	// cout << Response << endl;
 	client.ResponsLength = Response.length();
 }
 
@@ -354,7 +356,8 @@ void HandleRequest::handleDelte()
 	}
 	else
 	{
-		ResBody = "<h1><center>Deleted successfully</center></h1>";
+		ResBody = "<h1><center><a href=\"" + string("/") + "\">Webserv Home</a> </center></h1>";
+		ResBody += "<h1><center>Deleted successfully</center></h1>";
 		BodyCT = "text/html";
 	}
 	
@@ -481,7 +484,9 @@ void HandleRequest::splitBody()
 	for (vector<string>::iterator it = data.begin(); it != data.end(); it++)
 	{
 		Getdata gt(*it,headers["Content-Type"],0,loc,root);
-			
+		ResBody = "<h1><center><a href=\"" + string("/") + "\">Webserv Home</a> </center></h1>";
+		ResBody += "<h1><center>Uploaded successfully</center></h1>";
+		BodyCT = "text/html";
 	}
 }
 

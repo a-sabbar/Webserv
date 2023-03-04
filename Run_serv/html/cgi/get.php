@@ -1,5 +1,5 @@
 <html>
-<h1><pre><a href="/">Webserv Home</a> </pre></h1>
+<h1><a href="/">Webserv Home</a> </h1>
 <body>
         <p>CGI Get Test</p>
 <?php

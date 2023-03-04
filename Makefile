@@ -1,4 +1,4 @@
-NAME = webser
+NAME = webserv
 
 GG = c++
 
@@ -6,7 +6,6 @@ Header1 =  Webserv.hpp Request/HandleRequest.hpp Request/Getdata.hpp parsing/ser
 
 VERSION = -std=c++98  -Wall -Wextra -Werror -g 
 
-# -g -fsanitize=address,undefined,integer
 
 SRC =	main.cpp	\
 		parsing/server.cpp	\
