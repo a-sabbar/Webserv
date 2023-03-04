@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run_server.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/05 20:16:36 by asabbar           #+#    #+#             */
-/*   Updated: 2023/03/04 11:39:05 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/03/04 19:12:19 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -257,7 +257,6 @@ void    run_server(std::vector<serv_d> &serv_data)
 					{
 						close(fds.at(i).fd);
 						clearPollList(fds, *it_c, addNewFd);
-						std::cout <<"============== CLOSE ==============\n";
 						break ;
 					}
 					it_c->request.append(it_c->buffer, rec);
@@ -324,8 +323,6 @@ void    run_server(std::vector<serv_d> &serv_data)
 						{
 							close(fds.at(i).fd);
 							clearPollList(fds, *it_c, addNewFd);
-							continue;
-							std::cout <<"============== CLOSE ==============\n";
 							break ;
 						}
 						if(it_c->sendLen >= (ssize_t)it_c->Respons.length())

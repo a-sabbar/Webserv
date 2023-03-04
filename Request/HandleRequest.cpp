@@ -6,7 +6,7 @@
 /*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/03/04 18:58:39 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/04 19:09:18 by zait-sli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -304,9 +304,15 @@ void HandleRequest::handleGet()
 	if (ifDir(root + target))
 	{
 		
-		if (loc.find("index") != loc.end() && checkExist(root + target + "/" +  loc["index"].at(0)))
+		if (loc.find("index") != loc.end())
 		{
-			ResBody = ReadFile(root + target + "/" + loc["index"].at(0));
+			if ( checkExist(root + target + "/" +  loc["index"].at(0)))
+				ResBody = ReadFile(root + target + "/" + loc["index"].at(0));
+			else
+			{
+				code = "404";
+				message = "Not Found";
+			}
 		}
 		else if (checkExist(root + target + "/index.html"))
 		{
