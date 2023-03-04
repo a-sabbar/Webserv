@@ -110,7 +110,7 @@ string HandleRequest::handle_cgi(string f)
     }
     remove("/tmp/tmp.tmp");
     remove("/tmp/in.tmp");
-    cout <<ret.str() << endl;
+    // cout <<ret.str() << endl;
     return ret.str();
 }
  

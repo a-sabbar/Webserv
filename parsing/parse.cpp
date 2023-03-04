@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:23 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/03/01 14:38:08 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/04 14:45:41 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -388,6 +388,7 @@ void parse::readConfig(std::string fileName)
 	getline(myfile, rawFile, '\0');
 	if (rawFile.empty())
 		throw ConfigNotValid();
+	myfile.close();
 	remove_comments();
 	while (rawFile.find("\t") != std::string::npos)
 		rawFile.replace(rawFile.find("\t"), 1, " ");
@@ -579,11 +580,11 @@ std::vector<Location> parse::getLocations(std::string Fpart)
 		int secondBracket = Fpart.find("}", fisrtBracket);
 		temp.autoindex = getParamLocation(Fpart, "autoindex ", fisrtBracket, secondBracket, 0);
 		temp.root = getParamLocation(Fpart, "root ", fisrtBracket, secondBracket, 0);
-		temp.index = getParamLocation(Fpart, "indexPath", fisrtBracket, secondBracket, 0);
-		temp.methods = split(getParamLocation(Fpart, "methods", fisrtBracket, secondBracket, 1), ' ');
-		temp.returnn = getParamLocation(Fpart, "return", fisrtBracket, secondBracket, 0);
-		temp.cgi_bin = getParamLocation(Fpart, "cgi_bin", fisrtBracket, secondBracket, obli);
-		temp.upload_store = getParamLocation(Fpart, "upload_store", fisrtBracket, secondBracket, 0);
+		temp.index = getParamLocation(Fpart, "indexPath ", fisrtBracket, secondBracket, 0);
+		temp.methods = split(getParamLocation(Fpart, "methods ", fisrtBracket, secondBracket, 1), ' ');
+		temp.returnn = getParamLocation(Fpart, "return ", fisrtBracket, secondBracket, 0);
+		temp.cgi_bin = getParamLocation(Fpart, "cgi_bin ", fisrtBracket, secondBracket, obli);
+		temp.upload_store = getParamLocation(Fpart, "upload_store ", fisrtBracket, secondBracket, 0);
 
 		ret.push_back(temp);
 		i = secondBracket;

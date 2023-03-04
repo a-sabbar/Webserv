@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleRequest.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 17:07:58 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/03/04 04:46:31 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/04 11:40:30 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ HandleRequest::HandleRequest(client_d &client, serv_d &server)
 	}
 	generateResponse();
 	client.Respons = Response;
-	cout << Response << endl;
+	// cout << Response << endl;
 	client.ResponsLength = Response.length();
 }
 

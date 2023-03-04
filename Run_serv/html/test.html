@@ -1,5 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webserv</title>
+    <link rel="icon" type="image/x-icon" href="https://i.pinimg.com/736x/78/eb/4a/78eb4a5d75692d02cb6ecd0635462482.jpg">
+
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            background: black;
+            color: #FFFF;
+        }
+        main{
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            position: relative;
+        }
+        h1{
+            position: absolute;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            top: 50px;
+            font-size: 60px;
+        }
+        a{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 30px;
+            text-decoration: none;
+            color: #FFFF;
+            margin: 20px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: rgba(106, 142, 35, 0.288);
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Webserv</h1>
+        <a href="/">Home</a>
+        <a href="/cgi/GetCgi.html">Get method CGI</a>
+        <a href="/cgi/PostCgi.html">POST method CGI</a>
+        <a href="/cgi/Cookie.php">Get cookie</a>
+        <a href="/cgi/session_start.php">Start your session</a>
+        <a href="/cgi/session_get.php">get your session</a>
+        <a href="/upload.html">Upload</a>
+        <a href="/tt.mp4">get Video</a>
+        <a href="/wallpaperflare.com_wallpaper copy.jpg">get image</a>
+        <!-- <img src="/91007693.jpg" alt=""> -->
+    </main>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
 <head><h1><center>Webserv</center></h1></head>
 <body>
     <h3><a href="/">Home</a></h3>
@@ -10,4 +72,4 @@
     <h3><a href="/cgi/session_get.php">get your session</a></h3>
 
 </body>
-</html>
+</html> -->
