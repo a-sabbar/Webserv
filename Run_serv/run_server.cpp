@@ -373,7 +373,7 @@ void    run_server(std::vector<serv_d> &serv_data)
 					if (it_c == addNewFd.end()) {
 						continue;
 					}
-					if(it_c->lastRead && get_time() - it_c->lastRead > TIMEOUT)
+					if(!it_c->endRead && it_c->lastRead && get_time() - it_c->lastRead > TIMEOUT)
 					{
 						std::cerr << "============ TIMEOUUUUT ============\n";
 						for (it = serv_data.begin(); it != serv_data.end(); it++)
