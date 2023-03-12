@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zait-sli <zait-sli@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:30 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/03/01 14:34:25 by zait-sli         ###   ########.fr       */
+/*   Updated: 2023/03/12 12:37:18 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,14 +57,11 @@ class serv_d
 	public:
 		std::vector<int>																sock;
 		int 																			backlog;
-		int 																			listening;
-		int 																			connection;
 		std::string 																	root;
 		std::string 																	host;
 		std::string 																	listen;
 		std::vector<std::string> 														listens;
 		std::vector<serv_d> 															DuplicatePort;
-		std::vector<std::string> 														myPorts;
 		size_t 																			max_body_size;
 		std::vector<std::string>														server_name;
 		std::vector<class Location>														Loc;

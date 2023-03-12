@@ -6,7 +6,7 @@
 /*   By: asabbar <asabbar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 04:40:19 by zait-sli          #+#    #+#             */
-/*   Updated: 2023/02/28 10:46:11 by asabbar          ###   ########.fr       */
+/*   Updated: 2023/03/12 12:36:01 by asabbar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ class parse
 		{
 			public:
 				const char * what() const throw(){
-					return ("Config file not valid");
+					return ("Config file not valid ❌");
 				}
 		}	;
 		void myTrim(std::string &s, const std::string &toTrim);

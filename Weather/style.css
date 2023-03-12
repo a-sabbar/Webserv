@@ -1,0 +1,25 @@
+body{
+    background: #eeedec;
+    letter-spacing: 0.2em;
+    font-size:1.2em;
+}
+.container{
+    max-width: 500px;
+}
+.icon{
+    position: relative;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    width: 100px;
+    margin-bottom: -50px;
+    border: 1px solid gray;
+}
+.card {
+    border-radius: 30px! important;
+}
+.time {
+    border-top-left-radius: 30px! important;
+    border-top-right-radius: 30px! important;
+}

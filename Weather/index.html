@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <title>WeatherProject</title>
+</head>
+<body>
+    <div class="container my-5 mx-auto">
+        <h1 class="text-muted text-center my-4"> WeatherProject </h1>
+        <form class="change-location my-4 text-center text-muted">
+            <label for="city">Enter a location for Weather information </label>
+            <input placeholder="location for Weather" type="text" name="city" class="form-control p-4 " style="margin-top: 20px;font-size: 1.1em;" >
+        </form>
+        <div class="card shadow-lg rounded d-none ">
+            <img src="https://via.placeholder.com/300x400" alt="" class="time card-img-top">
+            <div class="icon bg-light max-auto text-center">
+                <img alt="">
+            </div>
+            <div class="text-muted text-uppercase text-center details">
+                <h5 class="my-3">City name</h5>
+                <div class="my-3">Weather candition</div>
+                <div class="display-4 my-4">
+                    <span>temp</span>
+                    <span>&deg;C</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="scripts/getApi.js"></script>
+    <script src="scripts/app.js"></script>
+</body>
+</html>

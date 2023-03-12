@@ -2,7 +2,7 @@ NAME = webserv
 
 GG = c++
 
-Header1 =  Webserv.hpp Request/HandleRequest.hpp Request/Getdata.hpp parsing/server.hpp parsing/parse.hpp  
+Header1 =  Webserv.hpp Request/HandleRequest.hpp Request/Getdata.hpp parsing/server.hpp parsing/parse.hpp Run_serv/run_server.hpp  
 
 VERSION = -std=c++98  -Wall -Wextra -Werror -g 
 
